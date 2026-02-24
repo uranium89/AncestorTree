@@ -28,11 +28,18 @@ export default function TreePage() {
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Hướng dẫn</CardTitle>
-          <CardDescription>
-            • <span className="text-blue-500">Viền xanh</span> = Nam • 
-            <span className="text-pink-500"> Viền hồng</span> = Nữ • 
-            <span className="text-pink-400"> Đường hồng</span> = Vợ chồng • 
-            † = Đã mất
+          <CardDescription className="space-y-1">
+            <span className="block sm:inline">
+              • <span className="text-blue-500">Viền xanh</span> = Nam 
+              • <span className="text-pink-500">Viền hồng</span> = Nữ
+            </span>
+            <span className="block sm:inline">
+              • <span className="text-pink-400">Đường hồng</span> = Vợ chồng 
+              • † = Đã mất
+            </span>
+            <span className="block text-xs mt-1">
+              💡 Trên mobile: kéo để di chuyển, dùng nút +/- để zoom
+            </span>
           </CardDescription>
         </CardHeader>
         <CardContent>

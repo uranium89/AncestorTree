@@ -179,8 +179,11 @@ export default function PersonDetailPage({ params }: PageProps) {
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>Hủy</AlertDialogCancel>
-                      <AlertDialogAction onClick={handleDelete}>
-                        Xóa
+                      <AlertDialogAction 
+                        onClick={handleDelete}
+                        disabled={deleteMutation.isPending}
+                      >
+                        {deleteMutation.isPending ? 'Đang xóa...' : 'Xóa'}
                       </AlertDialogAction>
                     </AlertDialogFooter>
                   </AlertDialogContent>

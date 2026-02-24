@@ -198,7 +198,8 @@ function buildTreeLayout(data: TreeData) {
 
 export function FamilyTree() {
   const { data, isLoading, error } = useTreeData();
-  const [scale, setScale] = useState(1);
+  // Start with smaller scale on mobile
+  const [scale, setScale] = useState(typeof window !== 'undefined' && window.innerWidth < 768 ? 0.7 : 1);
   const [selectedPerson, setSelectedPerson] = useState<Person | null>(null);
 
   const layout = useMemo(() => {

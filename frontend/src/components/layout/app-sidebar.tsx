@@ -55,9 +55,9 @@ const mainNavItems = [
 ];
 
 const adminNavItems = [
+  { title: 'Bảng điều khiển', url: '/admin', icon: Settings },
   { title: 'Người dùng', url: '/admin/users', icon: UserCog },
   { title: 'Đề xuất chỉnh sửa', url: '/admin/contributions', icon: ClipboardList },
-  { title: 'Cài đặt', url: '/admin/settings', icon: Settings },
 ];
 
 export function AppSidebar() {

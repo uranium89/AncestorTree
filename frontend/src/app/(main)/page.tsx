@@ -9,7 +9,8 @@
 import Link from 'next/link';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { GitBranchPlus, Calendar, Users, BookUser, FileText, ArrowRight } from 'lucide-react';
+import { GitBranchPlus, Calendar, Users, ArrowRight } from 'lucide-react';
+import { StatsCard } from '@/components/home/stats-card';
 
 const features = [
   {
@@ -50,12 +51,20 @@ export default function HomePage() {
           <p className="text-lg md:text-xl text-emerald-100 mb-8 max-w-2xl mx-auto">
             &ldquo;Gìn giữ tinh hoa - Tiếp bước cha ông&rdquo;
           </p>
-          <Button asChild size="lg" variant="secondary">
-            <Link href="/tree">
-              <GitBranchPlus className="mr-2 h-5 w-5" />
-              Xem Gia Phả
-            </Link>
-          </Button>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button asChild size="lg" variant="secondary">
+              <Link href="/tree">
+                <GitBranchPlus className="mr-2 h-5 w-5" />
+                Xem Gia Phả
+              </Link>
+            </Button>
+            <Button asChild size="lg" variant="outline" className="bg-transparent border-white text-white hover:bg-white/10">
+              <Link href="/people">
+                <Users className="mr-2 h-5 w-5" />
+                Danh sách thành viên
+              </Link>
+            </Button>
+          </div>
         </div>
       </section>
 
@@ -84,33 +93,9 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Stats Section */}
+      {/* Stats Section - Dynamic */}
       <section className="container mx-auto px-4 py-12 md:py-16">
-        <Card>
-          <CardHeader>
-            <CardTitle>📊 Thống kê</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-              <div className="text-center">
-                <div className="text-3xl font-bold text-emerald-600">--</div>
-                <div className="text-sm text-muted-foreground">Thành viên</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-emerald-600">--</div>
-                <div className="text-sm text-muted-foreground">Thế hệ</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-emerald-600">--</div>
-                <div className="text-sm text-muted-foreground">Chi/Nhánh</div>
-              </div>
-              <div className="text-center">
-                <div className="text-3xl font-bold text-amber-600">--</div>
-                <div className="text-sm text-muted-foreground">Ngày giỗ tháng này</div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+        <StatsCard />
       </section>
 
       {/* Upcoming Events */}
@@ -122,7 +107,10 @@ export default function HomePage() {
           </CardHeader>
           <CardContent>
             <div className="text-center py-8 text-muted-foreground">
-              Chưa có dữ liệu ngày giỗ
+              <p>Chưa có dữ liệu ngày giỗ</p>
+              <Button asChild variant="link" className="mt-2">
+                <Link href="/people">Thêm thành viên để quản lý ngày giỗ</Link>
+              </Button>
             </div>
           </CardContent>
         </Card>
