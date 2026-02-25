@@ -417,7 +417,7 @@ status: approved
 |------|------|------|-----------|
 | Sponsor | Chủ tịch HĐGT | | ⏳ Pending |
 | PM | @pm | 2026-02-24 | ✅ Approved |
-| Tech Lead | @dev | | ⏳ Pending |
+| Tech Lead | @dev | 2026-02-25 | ✅ Approved |
 
 ---
 

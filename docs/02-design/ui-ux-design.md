@@ -2,7 +2,7 @@
 project: AncestorTree
 path: docs/02-design/ui-ux-design.md
 type: design
-version: 1.1.0
+version: 1.2.0
 updated: 2026-02-25
 owner: "@fullstack"
 status: approved
@@ -331,8 +331,6 @@ MOBILE (<768px)
 │  ○ QL Quỹ & Học bổng               │
 │                                     │
 │  ○ QL Hương ước                     │
-│                                     │
-│  ○ Cài đặt                          │
 │                                     │
 ├─────────────────────────────────────┤
 │  ┌─────┐                            │
@@ -993,7 +991,7 @@ Gender:
 | Role | Name | Date | Signature |
 |------|------|------|-----------|
 | Designer | @fullstack | 2026-02-24 | ✅ Approved |
-| PM | @pm | | ⏳ Pending |
+| PM | @pm | 2026-02-25 | ✅ Approved |
 | Sponsor | Chủ tịch HĐGT | | ⏳ Pending |
 
 ---

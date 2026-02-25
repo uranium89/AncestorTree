@@ -2,8 +2,8 @@
 project: AncestorTree
 path: docs/02-design/technical-design.md
 type: design
-version: 1.0.0
-updated: 2026-02-24
+version: 1.2.0
+updated: 2026-02-25
 owner: "@dev-team"
 status: approved
 ---
@@ -16,6 +16,7 @@ status: approved
 |---------|------------|-----------|---------------------------------------------------|
 | 1.0.0   | 2026-02-24 | @dev-team | Initial draft                                     |
 | 1.1.0   | 2026-02-25 | @pm       | Add Vinh danh, Quỹ khuyến học, Hương ước         |
+| 1.2.0   | 2026-02-25 | @architect | Update to match actual implementation (S1-S6)    |
 
 ---
 
@@ -49,8 +50,8 @@ status: approved
 │   │  ┌───────────────────────────────────────────────────────────┐  │  │
 │   │  │                    State Management                        │  │  │
 │   │  │  ┌─────────────┐  ┌─────────────┐  ┌─────────────────┐   │  │  │
-│   │  │  │   Zustand   │  │ React Query │  │  Auth Context   │   │  │  │
-│   │  │  │   Stores    │  │   Cache     │  │                 │   │  │  │
+│   │  │  │ React Query │  │ Auth Context│  │  Local State    │   │  │  │
+│   │  │  │   Cache     │  │  (useAuth)  │  │  (component)   │   │  │  │
 │   │  │  └─────────────┘  └─────────────┘  └─────────────────┘   │  │  │
 │   │  └───────────────────────────────────────────────────────────┘  │  │
 │   └─────────────────────────────────────────────────────────────────┘  │
@@ -89,11 +90,12 @@ status: approved
 
 | Decision | Choice | Rationale |
 |----------|--------|-----------|
-| **Frontend Framework** | Next.js 15 | SSR, App Router, performance |
-| **Language** | TypeScript | Type safety, maintainability |
+| **Frontend Framework** | Next.js 16 | SSR, App Router, performance |
+| **Language** | TypeScript 5 | Type safety, maintainability |
 | **Styling** | Tailwind CSS 4 | Utility-first, responsive |
 | **UI Components** | shadcn/ui | Accessible, customizable |
-| **State Management** | Zustand + React Query | Simple, powerful |
+| **State Management** | React Context + React Query | Auth context, server state cache |
+| **Form Handling** | react-hook-form + Zod 4 | Validation, type-safe forms |
 | **Backend** | Supabase | Auth, DB, Storage in one |
 | **Database** | PostgreSQL | Relational, ACID, powerful |
 | **Hosting** | Vercel | Free, auto-deploy, edge |
@@ -659,88 +661,104 @@ export function useTreeData() {
 
 ```
 src/
-├── app/                          # Next.js App Router
-│   ├── (auth)/                   # Auth pages (no layout)
+├── app/                              # Next.js App Router
+│   ├── layout.tsx                    # Root layout (SEO metadata)
+│   ├── globals.css                   # Global styles + print styles
+│   ├── (auth)/                       # Auth pages (no sidebar)
 │   │   ├── login/page.tsx
-│   │   ├── register/page.tsx
-│   │   └── forgot-password/page.tsx
-│   ├── (main)/                   # Main app (with sidebar)
-│   │   ├── layout.tsx            # Sidebar + Header
-│   │   ├── page.tsx              # Dashboard/Home
-│   │   ├── tree/page.tsx         # Family tree
+│   │   └── register/page.tsx
+│   ├── (main)/                       # Main app (with sidebar)
+│   │   ├── layout.tsx                # Sidebar + Header layout
+│   │   ├── page.tsx                  # Dashboard/Home with stats
+│   │   ├── tree/page.tsx             # Interactive family tree
 │   │   ├── people/
-│   │   │   ├── page.tsx          # People list
-│   │   │   └── [id]/page.tsx     # Person detail
-│   │   ├── directory/page.tsx    # Contact directory
-│   │   ├── events/page.tsx       # Memorial calendar
-│   │   ├── achievements/page.tsx # Achievement honors (v1.1)
-│   │   ├── fund/page.tsx         # Education fund dashboard (v1.1)
-│   │   ├── charter/page.tsx      # Hương ước / Clan rules (v1.1)
-│   │   ├── book/page.tsx         # Genealogy book
+│   │   │   ├── page.tsx              # People list with search/filter
+│   │   │   ├── new/page.tsx          # Create new person
+│   │   │   └── [id]/
+│   │   │       ├── page.tsx          # Person detail + gallery
+│   │   │       └── edit/page.tsx     # Edit person form
+│   │   ├── directory/page.tsx        # Contact directory
+│   │   ├── events/page.tsx           # Memorial calendar
+│   │   ├── contributions/page.tsx    # Contribution submissions
+│   │   ├── documents/
+│   │   │   ├── page.tsx              # GEDCOM export + book link
+│   │   │   └── book/page.tsx         # Genealogy book view
+│   │   ├── achievements/page.tsx     # Achievement honors (v1.1)
+│   │   ├── fund/page.tsx             # Education fund dashboard (v1.1)
+│   │   ├── charter/page.tsx          # Hương ước / Clan rules (v1.1)
 │   │   └── admin/
-│   │       ├── page.tsx          # Admin dashboard
-│   │       ├── users/page.tsx    # User management
-│   │       ├── achievements/     # Manage achievements (v1.1)
-│   │       ├── fund/             # Manage fund & scholarships (v1.1)
-│   │       ├── charter/          # Manage clan articles (v1.1)
-│   │       └── settings/page.tsx # Settings
-│   ├── api/                      # API routes (if needed)
-│   ├── layout.tsx                # Root layout
-│   └── globals.css               # Global styles
+│   │       ├── page.tsx              # Admin dashboard
+│   │       ├── users/page.tsx        # User management
+│   │       ├── contributions/page.tsx # Review contributions
+│   │       ├── achievements/page.tsx  # Manage achievements (v1.1)
+│   │       ├── fund/page.tsx          # Manage fund & scholarships (v1.1)
+│   │       └── charter/page.tsx       # Manage clan articles (v1.1)
+│   │   # Each route also has error.tsx and loading.tsx files
+│   └── middleware.ts                 # Auth + role-based route protection
 │
 ├── components/
-│   ├── ui/                       # shadcn/ui components
-│   │   ├── button.tsx
-│   │   ├── card.tsx
-│   │   ├── dialog.tsx
-│   │   └── ...
+│   ├── ui/                           # shadcn/ui components (23 files)
+│   │   ├── button.tsx, card.tsx, dialog.tsx, input.tsx, ...
+│   │   ├── sidebar.tsx, sheet.tsx, tabs.tsx, table.tsx
+│   │   ├── select.tsx, checkbox.tsx, switch.tsx
+│   │   └── skeleton.tsx, badge.tsx, avatar.tsx, tooltip.tsx
 │   ├── layout/
-│   │   ├── sidebar.tsx
-│   │   ├── header.tsx
-│   │   └── mobile-nav.tsx
+│   │   └── app-sidebar.tsx           # Sidebar + header + mobile nav
 │   ├── tree/
-│   │   ├── tree-view.tsx         # Main tree component
-│   │   ├── tree-node.tsx         # Individual node
-│   │   ├── tree-connection.tsx   # Lines between nodes
-│   │   ├── tree-controls.tsx     # Zoom, filter controls
-│   │   └── tree-minimap.tsx      # Overview minimap
+│   │   └── family-tree.tsx           # All-in-one tree component
 │   ├── people/
-│   │   ├── person-card.tsx
-│   │   ├── person-form.tsx
-│   │   └── person-detail.tsx
+│   │   ├── person-card.tsx           # Person display card
+│   │   ├── person-form.tsx           # Create/edit form
+│   │   ├── photo-gallery.tsx         # Photo grid + upload
+│   │   └── avatar-upload.tsx         # Avatar upload overlay
+│   ├── home/
+│   │   └── stats-card.tsx            # Dashboard stats card
+│   ├── events/
+│   │   ├── calendar-grid.tsx         # Calendar view component
+│   │   ├── add-event-dialog.tsx      # Event creation dialog
+│   │   └── event-constants.ts        # Event type constants
 │   ├── auth/
-│   │   ├── auth-provider.tsx
-│   │   ├── login-form.tsx
-│   │   └── protected-route.tsx
+│   │   └── auth-provider.tsx         # Auth context + useAuth hook
+│   ├── providers/
+│   │   └── query-provider.tsx        # React Query provider
 │   └── shared/
-│       ├── search-input.tsx
-│       ├── loading.tsx
-│       └── error-boundary.tsx
+│       ├── error-boundary.tsx        # Client error boundary
+│       └── route-error.tsx           # Reusable route error UI
 │
 ├── lib/
-│   ├── supabase.ts               # Supabase client
-│   ├── supabase-data.ts          # Data operations
-│   ├── tree-layout.ts            # Tree positioning algorithm
-│   ├── lunar-calendar.ts         # Âm lịch conversion
-│   ├── gedcom.ts                 # GEDCOM export/import
-│   └── utils.ts                  # Helpers
+│   ├── supabase.ts                   # Supabase browser client
+│   ├── supabase-data.ts              # Core data operations (people, families, etc.)
+│   ├── supabase-data-achievements.ts # Achievement CRUD (v1.1)
+│   ├── supabase-data-fund.ts         # Fund + scholarship CRUD (v1.1)
+│   ├── supabase-data-charter.ts      # Clan article CRUD (v1.1)
+│   ├── supabase-storage.ts           # File upload to Supabase Storage
+│   ├── lunar-calendar.ts             # Lunar calendar conversion
+│   ├── gedcom-export.ts              # GEDCOM 5.5.1 export
+│   ├── book-generator.ts             # Book chapter generator
+│   ├── format.ts                     # Shared formatters (formatVND)
+│   ├── utils.ts                      # cn() helper
+│   └── validations/
+│       └── person.ts                 # Zod person schema
 │
 ├── hooks/
-│   ├── usePeople.ts
-│   ├── useFamilies.ts
-│   ├── useTree.ts
-│   ├── useAuth.ts
-│   └── useSearch.ts
-│
-├── stores/
-│   ├── tree-store.ts             # Tree UI state (zoom, selected)
-│   └── settings-store.ts         # App settings
+│   ├── use-people.ts                 # People queries + mutations
+│   ├── use-families.ts               # Family queries + mutations
+│   ├── use-profiles.ts               # Profile queries
+│   ├── use-contributions.ts          # Contribution queries
+│   ├── use-events.ts                 # Event queries + mutations
+│   ├── use-media.ts                  # Media queries + mutations
+│   ├── use-achievements.ts           # Achievement queries (v1.1)
+│   ├── use-fund.ts                   # Fund + scholarship queries (v1.1)
+│   ├── use-clan-articles.ts          # Clan article queries (v1.1)
+│   └── use-mobile.ts                 # Mobile detection hook
 │
 └── types/
-    ├── person.ts
-    ├── family.ts
-    └── index.ts
+    └── index.ts                      # All TypeScript interfaces + enums
 ```
+
+> **Note:** Zustand is installed but not actively used. All state management is via
+> React Context (AuthProvider) and React Query cache. Tree UI state (zoom, pan) is
+> managed locally within the family-tree.tsx component.
 
 ### 5.2 Key Components
 
@@ -937,8 +955,8 @@ export interface ChiConfig {
                      │                    │
                      ▼                    │
               ┌─────────────┐            │
-              │   Zustand   │            │
-              │ Auth Store  │            │
+              │   React     │            │
+              │ AuthContext  │            │
               └─────────────┘            │
                      │                    │
                      │    API Calls       │
@@ -1049,7 +1067,8 @@ export interface ChiConfig {
 | Role | Name | Date | Signature |
 |------|------|------|-----------|
 | Tech Lead | @dev-team | 2026-02-24 | ✅ Approved |
-| PM | @pm | | ⏳ Pending |
+| Architect | @architect | 2026-02-25 | ✅ Approved (v1.2.0 update) |
+| PM | @pm | 2026-02-25 | ✅ Approved |
 | Sponsor | Chủ tịch HĐGT | | ⏳ Pending |
 
 ---
