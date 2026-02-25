@@ -12,7 +12,7 @@ import Link from 'next/link';
 import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
-import type { Person } from '@/types';
+import { type Person, getZodiacYear } from '@/types';
 import { User, MapPin, Calendar } from 'lucide-react';
 
 interface PersonCardProps {
@@ -69,6 +69,7 @@ export function PersonCard({ person, showDetails = true }: PersonCardProps) {
                       <Calendar className="h-3.5 w-3.5" />
                       <span>
                         {person.birth_year}
+                        {` (${getZodiacYear(person.birth_year)})`}
                         {person.death_year && ` - ${person.death_year}`}
                       </span>
                     </div>

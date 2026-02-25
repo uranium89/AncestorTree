@@ -2,8 +2,8 @@
 project: AncestorTree
 path: docs/01-planning/roadmap.md
 type: planning
-version: 1.0.0
-updated: 2026-02-24
+version: 1.1.0
+updated: 2026-02-25
 owner: "@pm"
 status: approved
 ---
@@ -15,16 +15,22 @@ status: approved
 ```
  2026
  ─────────────────────────────────────────────────────────────────────────
- Feb                    Mar                    Apr                    May
- ├─────────────────────┼─────────────────────┼─────────────────────┼────
- │                     │                     │                     │
- │  ┌─────────────┐    │  ┌─────────────┐    │  ┌─────────────┐    │
- │  │   v0.1.0    │    │  │   v1.0.0    │    │  │   v1.1.0    │    │
- │  │   Alpha     │    │  │    MVP      │    │  │  Features   │    │
- │  │  (Sprint 1) │    │  │ (Sprint 2-3)│    │  │ (Sprint 4+) │    │
- │  └─────────────┘    │  └─────────────┘    │  └─────────────┘    │
- │                     │                     │                     │
- └─────────────────────┴─────────────────────┴─────────────────────┴────
+ Feb                    Mar                    Apr
+ ├─────────────────────┼─────────────────────┼────
+ │                     │                     │
+ │  ┌─────────────┐    │  ┌─────────────┐    │  ┌─────────────┐
+ │  │   v0.1.0    │    │  │   v1.0.0    │    │  │   v1.3.0    │
+ │  │   Alpha     │    │  │    MVP      │    │  │   Culture   │
+ │  │  (Sprint 1) │    │  │ (Sprint 2-3)│    │  │  (Sprint 6) │
+ │  └─────────────┘    │  └─────────────┘    │  └─────────────┘
+ │                     │                     │
+ │               ┌─────────────┐  ┌─────────────┐
+ │               │   v1.1.0    │  │   v1.2.0    │
+ │               │  Enhanced   │  │   Release   │
+ │               │ (Sprint 4)  │  │  (Sprint 5) │
+ │               └─────────────┘  └─────────────┘
+ │                     │                     │
+ └─────────────────────┴─────────────────────┴────
 ```
 
 ---
@@ -76,18 +82,65 @@ status: approved
 
 ---
 
-### v1.1.0 - Features (Sprint 4+)
+### v1.1.0 - Enhanced (Sprint 4)
 
-**Target:** Week 5-6 (Mid Mar 2026)
-**Goal:** Enhanced features based on feedback
+**Target:** Week 4 (Mar 17-21, 2026)
+**Goal:** Directory + Memorial calendar + Contributions
 
 | Epic | Stories | Priority |
 |------|---------|----------|
-| **Contributions** | Viewer suggest edits | P1 |
-| **Directory** | Contact list | P1 |
-| **Book Generator** | Generate genealogy book | P1 |
-| **Ancestors/Descendants** | Filter views | P1 |
-| **Export** | GEDCOM export | P2 |
+| **Directory** | Contact list with privacy controls | P1 |
+| **Memorial Calendar** | Âm lịch, ngày giỗ tracking | P1 |
+| **Lunar Calendar** | Solar-lunar conversion utility | P1 |
+| **Contributions** | Viewer suggest edits, admin review | P1 |
+
+**Exit Criteria:**
+- [ ] Directory shows contacts with privacy settings
+- [ ] Memorial calendar displays giỗ dates
+- [ ] Lunar dates convert correctly
+- [ ] Contribution approve/reject workflow works
+
+---
+
+### v1.2.0 - Release (Sprint 5)
+
+**Target:** Week 5 (Mar 24-28, 2026)
+**Goal:** GEDCOM export + Book generator + Final polish
+
+| Epic | Stories | Priority |
+|------|---------|----------|
+| **GEDCOM Export** | Export valid GEDCOM file | P1 |
+| **Book Generator** | Formatted genealogy book view | P1 |
+| **Photo Upload** | Media upload & gallery | P1 |
+| **Performance** | Lighthouse >90, SEO, polish | P1 |
+
+**Exit Criteria:**
+- [ ] GEDCOM exports valid file
+- [ ] Book view renders correctly
+- [ ] Photos upload & display
+- [ ] Lighthouse >90 all categories
+
+---
+
+### v1.3.0 - Culture & Community (Sprint 6)
+
+**Target:** Week 6 (Mar 31 - Apr 4, 2026)
+**Goal:** Achievement honors + Education fund + Family charter
+
+| Epic | Stories | Priority |
+|------|---------|----------|
+| **Achievement Honors** | Vinh danh thành tích (FR-1201~1206) | P1 |
+| **Education Fund** | Quỹ khuyến học, học bổng (FR-1301~1308) | P1 |
+| **Family Charter** | Hương ước gia tộc (FR-1401~1406) | P1 |
+
+**Exit Criteria:**
+- [ ] Achievements display with category filters
+- [ ] Fund dashboard shows balance and transactions
+- [ ] Scholarships can be created, approved, and paid
+- [ ] Charter articles display with category tabs
+- [ ] Admin can manage all new content
+
+> **Note:** Detailed Sprint 4-6 task breakdown available in [SPRINT-PLAN.md](../04-build/SPRINT-PLAN.md)
 
 ---
 
@@ -98,11 +151,11 @@ status: approved
 
 | Epic | Stories | Priority |
 |------|---------|----------|
-| **Âm lịch** | Lunar calendar dates | P1 |
-| **Quỹ họ** | Fund management | P2 |
-| **Nhà thờ họ** | Ancestral hall info | P2 |
-| **PDF Export** | Printable book | P2 |
+| **Nhà thờ họ** | Ancestral hall info (map, ảnh 360°) | P2 |
+| **Notifications** | Thông báo ngày giỗ (push) | P2 |
+| **Cross-clan** | Kết nối liên dòng họ | P2 |
 | **Multi-tenant** | Multiple families | P2 |
+| **Native Apps** | iOS/Android | P2 |
 
 ---
 
@@ -240,6 +293,18 @@ status: approved
 | Lighthouse score | >90 |
 | Production deployed | Yes |
 | Documentation | Complete |
+
+### Sprint 4-6
+
+| Metric | Target |
+|--------|--------|
+| Lunar dates correct | Yes |
+| Contribution workflow | Complete |
+| GEDCOM exports valid | Yes |
+| Achievements with filters | Yes |
+| Fund dashboard with balance | Yes |
+| Charter articles with tabs | Yes |
+| pnpm build passes | Yes |
 
 ---
 

@@ -2,8 +2,8 @@
 project: AncestorTree
 path: docs/01-planning/BRD.md
 type: planning
-version: 1.0.0
-updated: 2026-02-24
+version: 1.1.0
+updated: 2026-02-25
 owner: "@pm"
 status: approved
 ---
@@ -12,9 +12,10 @@ status: approved
 
 ## 1. Document Control
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0.0 | 2026-02-24 | @pm | Initial draft |
+| Version | Date       | Author | Changes                                            |
+|---------|------------|--------|----------------------------------------------------|
+| 1.0.0   | 2026-02-24 | @pm    | Initial draft                                      |
+| 1.1.0   | 2026-02-25 | @pm    | Add Vinh danh, Quỹ khuyến học, Hương ước          |
 
 ---
 
@@ -139,6 +140,41 @@ status: approved
 | **FR-1001** | GEDCOM 5.5.1 export | P1 | Valid GEDCOM file output |
 | **FR-1002** | GEDCOM 5.5.1 import | P2 | Parse and load GEDCOM file |
 | **FR-1003** | GEDCOM 7.0 support | P3 | Future standard compliance |
+
+### 3.11 Epic: Vinh danh Thành tích (Achievement Honors)
+
+| ID | Requirement | Priority | Acceptance Criteria |
+|----|-------------|----------|---------------------|
+| **FR-1201** | Bảng vinh danh con cháu có thành tích | P1 | Trang hiển thị danh sách vinh danh |
+| **FR-1202** | Phân loại thành tích (học tập, sự nghiệp, cống hiến) | P1 | Lọc theo danh mục |
+| **FR-1203** | Gắn thành tích với thành viên (person_id) | P1 | Link từ vinh danh tới trang cá nhân |
+| **FR-1204** | Admin quản lý thành tích (CRUD) | P1 | Thêm/sửa/xóa thành tích |
+| **FR-1205** | Hiển thị thành tích trên trang cá nhân | P2 | Badge/section trên person detail |
+| **FR-1206** | Thành tích theo năm | P2 | Lọc theo năm, xem theo mốc thời gian |
+
+### 3.12 Epic: Quỹ Khuyến học (Education Encouragement Fund)
+
+| ID | Requirement | Priority | Acceptance Criteria |
+|----|-------------|----------|---------------------|
+| **FR-1301** | Dashboard quỹ khuyến học (số dư, thu/chi) | P1 | Hiển thị tổng quan tài chính quỹ |
+| **FR-1302** | Ghi nhận đóng góp quỹ (tên, số tiền, ngày) | P1 | CRUD giao dịch đóng góp |
+| **FR-1303** | Cấp học bổng cho con em nghèo khó khăn | P1 | Workflow đề cử → duyệt → cấp |
+| **FR-1304** | Thưởng cho con em có thành tích học tập tốt | P1 | Workflow đề cử → duyệt → thưởng |
+| **FR-1305** | Phân loại: học bổng (khó khăn) vs khen thưởng (thành tích) | P1 | 2 loại rõ ràng, filter được |
+| **FR-1306** | Lịch sử cấp phát (ai nhận, bao nhiêu, khi nào) | P1 | Bảng lịch sử đầy đủ |
+| **FR-1307** | Báo cáo tổng kết năm (thu/chi/số suất) | P2 | Export hoặc view báo cáo |
+| **FR-1308** | Quy chế quỹ (điều kiện nhận, mức thưởng) | P2 | Trang hiển thị quy chế |
+
+### 3.13 Epic: Hương ước Dòng họ (Family Charter & Clan Rules)
+
+| ID | Requirement | Priority | Acceptance Criteria |
+|----|-------------|----------|---------------------|
+| **FR-1401** | Trang hiển thị Hương ước / Gia huấn | P1 | Trang đọc nội dung có format |
+| **FR-1402** | Phân mục: Gia huấn, Quy ước, Lời dặn con cháu | P1 | Tabs hoặc sections rõ ràng |
+| **FR-1403** | Admin quản lý nội dung (CRUD bài viết) | P1 | Rich text editor, thêm/sửa/xóa |
+| **FR-1404** | Thứ tự hiển thị bài viết (sort_order) | P2 | Kéo thả hoặc nhập số thứ tự |
+| **FR-1405** | Lịch sử chỉnh sửa (ai sửa, khi nào) | P2 | Audit trail cho nội dung |
+| **FR-1406** | Hiển thị nổi bật trên trang chủ | P2 | Trích dẫn hoặc card gia huấn |
 
 ---
 
@@ -354,11 +390,14 @@ status: approved
 |----|---------|----------|-------|
 | **FR-1101** | Quản lý tin tức/sự kiện dòng họ | P2 | News, announcements, events |
 | **FR-1102** | Thông báo qua Zalo/Telegram/Email | P2 | Integration với messaging platforms |
-| **FR-1103** | Quản lý quỹ họ | P2 | Contributions, expenses tracking |
+| **FR-1103** | ~~Quản lý quỹ họ~~ → Quỹ khuyến học | **P1** | **Moved to FR-1301~1308 (v1.1)** |
 | **FR-1104** | BOT hỗ trợ nhập liệu | P3 | AI-assisted data entry |
 | **FR-1105** | Virtual Tour 360° | P3 | Nhà thờ, lăng mộ, địa điểm lịch sử |
 | **FR-1106** | Native mobile apps | P3 | iOS/Android native apps |
 | **FR-1107** | Cross-clan connection | P3 | Liên kết giữa các dòng họ |
+| **FR-1201~06** | **Vinh danh thành tích** | **P1** | **New in v1.1 - Achievement honors** |
+| **FR-1301~08** | **Quỹ khuyến học & học bổng** | **P1** | **New in v1.1 - Education fund** |
+| **FR-1401~06** | **Hương ước dòng họ** | **P1** | **New in v1.1 - Family charter** |
 
 ### 9.3 Differentiation Strategy
 

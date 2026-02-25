@@ -1,28 +1,77 @@
 /**
  * @project AncestorTree
  * @file src/app/(main)/tree/page.tsx
- * @description Family tree visualization page
- * @version 1.0.0
- * @updated 2026-02-24
+ * @description Family tree visualization page with GEDCOM export
+ * @version 2.0.0
+ * @updated 2026-02-25
  */
 
 'use client';
 
-import { FamilyTree } from '@/components/tree/family-tree';
+import { useState } from 'react';
+import dynamic from 'next/dynamic';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { GitBranchPlus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import { useTreeData } from '@/hooks/use-families';
+import { generateGedcom, downloadGedcom } from '@/lib/gedcom-export';
+import { GitBranchPlus, Download, Loader2 } from 'lucide-react';
+import { toast } from 'sonner';
+
+const FamilyTree = dynamic(
+  () => import('@/components/tree/family-tree').then(m => ({ default: m.FamilyTree })),
+  {
+    ssr: false,
+    loading: () => <Skeleton className="h-[60vh] w-full rounded-lg" />,
+  }
+);
 
 export default function TreePage() {
+  const { data: treeData } = useTreeData();
+  const [isExporting, setIsExporting] = useState(false);
+
+  const handleExport = () => {
+    if (!treeData) {
+      toast.error('Chưa có dữ liệu để xuất');
+      return;
+    }
+    setIsExporting(true);
+    try {
+      const content = generateGedcom(treeData);
+      downloadGedcom(content);
+      toast.success('Xuất file GEDCOM thành công');
+    } catch {
+      toast.error('Lỗi khi xuất file');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   return (
     <div className="container mx-auto p-4 space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <GitBranchPlus className="h-6 w-6" />
-          Cây Gia Phả
-        </h1>
-        <p className="text-muted-foreground">
-          Sơ đồ phả hệ trực quan - Click vào từng thành viên để xem chi tiết
-        </p>
+      <div className="flex items-start justify-between">
+        <div>
+          <h1 className="text-2xl font-bold flex items-center gap-2">
+            <GitBranchPlus className="h-6 w-6" />
+            Cây Gia Phả
+          </h1>
+          <p className="text-muted-foreground">
+            Sơ đồ phả hệ trực quan - Click vào từng thành viên để xem chi tiết
+          </p>
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleExport}
+          disabled={isExporting || !treeData}
+        >
+          {isExporting ? (
+            <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+          ) : (
+            <Download className="h-4 w-4 mr-2" />
+          )}
+          Xuất GEDCOM
+        </Button>
       </div>
 
       <Card>
@@ -30,11 +79,11 @@ export default function TreePage() {
           <CardTitle className="text-base">Hướng dẫn</CardTitle>
           <CardDescription className="space-y-1">
             <span className="block sm:inline">
-              • <span className="text-blue-500">Viền xanh</span> = Nam 
+              • <span className="text-blue-500">Viền xanh</span> = Nam
               • <span className="text-pink-500">Viền hồng</span> = Nữ
             </span>
             <span className="block sm:inline">
-              • <span className="text-pink-400">Đường hồng</span> = Vợ chồng 
+              • <span className="text-pink-400">Đường hồng</span> = Vợ chồng
               • † = Đã mất
             </span>
             <span className="block text-xs mt-1">

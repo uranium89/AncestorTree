@@ -2,8 +2,8 @@
  * @project AncestorTree
  * @file src/app/layout.tsx
  * @description Root layout with providers (Auth, Tooltip, Toaster)
- * @version 1.0.0
- * @updated 2026-02-24
+ * @version 2.0.0
+ * @updated 2026-02-25
  */
 
 import type { Metadata } from "next";
@@ -20,9 +20,19 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Gia Phả Điện Tử - Chi tộc Đặng Đình",
-  description: "Phần mềm quản lý gia phả điện tử cho Chi tộc Đặng Đình, Thạch Lâm, Hà Tĩnh",
-  keywords: ["gia phả", "gia phả điện tử", "Đặng Đình", "Thạch Lâm", "Hà Tĩnh", "dòng họ"],
+  title: {
+    default: 'Gia Phả Điện Tử - Chi tộc Đặng Đình',
+    template: '%s | Gia Phả Đặng Đình',
+  },
+  description: 'Phần mềm quản lý gia phả điện tử cho Chi tộc Đặng Đình, Thạch Lâm, Hà Tĩnh. Lưu trữ thông tin dòng họ, cây gia phả, lịch giỗ chạp.',
+  keywords: ['gia phả', 'gia phả điện tử', 'Đặng Đình', 'Thạch Lâm', 'Hà Tĩnh', 'dòng họ', 'cây gia phả', 'phả hệ'],
+  authors: [{ name: 'Chi tộc Đặng Đình' }],
+  openGraph: {
+    title: 'Gia Phả Điện Tử - Chi tộc Đặng Đình',
+    description: 'Gìn giữ tinh hoa - Tiếp bước cha ông',
+    type: 'website',
+    locale: 'vi_VN',
+  },
 };
 
 export default function RootLayout({

@@ -59,6 +59,7 @@ export function useTreeData() {
   return useQuery({
     queryKey: familyKeys.tree(),
     queryFn: getTreeData,
+    staleTime: 5 * 60 * 1000, // 5 minutes
   });
 }
 

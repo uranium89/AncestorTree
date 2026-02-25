@@ -174,6 +174,112 @@ export interface LunarDate {
   leap: boolean;
 }
 
+// ─── Media ────────────────────────────────────────────────────────────────────
+
+export type MediaType = 'photo' | 'document' | 'video';
+
+export interface Media {
+  id: string;
+  person_id: string;
+  type: MediaType;
+  url: string;
+  caption?: string;
+  is_primary: boolean;
+  sort_order: number;
+  created_at: string;
+}
+
+export type CreateMediaInput = Omit<Media, 'id' | 'created_at'>;
+
+// ─── Achievement (Vinh danh) ──────────────────────────────────────────────────
+
+export type AchievementCategory = 'hoc_tap' | 'su_nghiep' | 'cong_hien' | 'other';
+
+export interface Achievement {
+  id: string;
+  person_id: string;
+  title: string;
+  category: AchievementCategory;
+  description?: string;
+  year?: number;
+  awarded_by?: string;
+  is_featured: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export type CreateAchievementInput = Omit<Achievement, 'id' | 'created_at' | 'updated_at'>;
+export type UpdateAchievementInput = Partial<CreateAchievementInput>;
+
+// ─── Fund Transaction (Quỹ khuyến học) ───────────────────────────────────────
+
+export type FundTransactionType = 'income' | 'expense';
+export type FundCategory = 'dong_gop' | 'hoc_bong' | 'khen_thuong' | 'other';
+
+export interface FundTransaction {
+  id: string;
+  type: FundTransactionType;
+  category: FundCategory;
+  amount: number;
+  donor_name?: string;
+  donor_person_id?: string;
+  recipient_id?: string;
+  description?: string;
+  transaction_date: string;
+  academic_year?: string;
+  created_by?: string;
+  created_at: string;
+}
+
+export type CreateFundTransactionInput = Omit<FundTransaction, 'id' | 'created_at'>;
+
+export interface FundBalance {
+  income: number;
+  expense: number;
+  balance: number;
+}
+
+// ─── Scholarship (Học bổng & Khen thưởng) ────────────────────────────────────
+
+export type ScholarshipType = 'hoc_bong' | 'khen_thuong';
+export type ScholarshipStatus = 'pending' | 'approved' | 'paid';
+
+export interface Scholarship {
+  id: string;
+  person_id: string;
+  type: ScholarshipType;
+  amount: number;
+  reason?: string;
+  academic_year: string;
+  school?: string;
+  grade_level?: string;
+  status: ScholarshipStatus;
+  approved_by?: string;
+  approved_at?: string;
+  created_at: string;
+}
+
+export type CreateScholarshipInput = Omit<Scholarship, 'id' | 'approved_by' | 'approved_at' | 'created_at'>;
+
+// ─── Clan Article (Hương ước) ─────────────────────────────────────────────────
+
+export type ClanArticleCategory = 'gia_huan' | 'quy_uoc' | 'loi_dan';
+
+export interface ClanArticle {
+  id: string;
+  title: string;
+  content: string;
+  category: ClanArticleCategory;
+  sort_order: number;
+  is_featured: boolean;
+  author_id?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export type CreateClanArticleInput = Omit<ClanArticle, 'id' | 'created_at' | 'updated_at'>;
+export type UpdateClanArticleInput = Partial<CreateClanArticleInput>;
+
 // ─── Zodiac ───────────────────────────────────────────────────────────────────
 
 export const CAN = ['Canh', 'Tân', 'Nhâm', 'Quý', 'Giáp', 'Ất', 'Bính', 'Đinh', 'Mậu', 'Kỷ'] as const;

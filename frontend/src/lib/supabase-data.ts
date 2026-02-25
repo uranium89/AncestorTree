@@ -1,5 +1,8 @@
 import { supabase } from './supabase';
-import type { Person, Family, Profile, CreatePersonInput, UpdatePersonInput } from '@/types';
+import type {
+  Person, Family, Profile, Contribution, Event, Media,
+  CreatePersonInput, UpdatePersonInput, CreateMediaInput, ContributionStatus, EventType,
+} from '@/types';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // People CRUD
@@ -77,13 +80,15 @@ export async function deletePerson(id: string): Promise<void> {
 }
 
 export async function searchPeople(query: string): Promise<Person[]> {
+  // Escape LIKE special characters to prevent pattern injection
+  const escaped = query.replace(/[%_\\]/g, '\\$&');
   const { data, error } = await supabase
     .from('people')
     .select('*')
-    .ilike('display_name', `%${query}%`)
+    .ilike('display_name', `%${escaped}%`)
     .order('display_name', { ascending: true })
     .limit(20);
-  
+
   if (error) throw error;
   return data || [];
 }
@@ -290,4 +295,269 @@ export async function getTreeData(): Promise<TreeData> {
     families: familiesRes.data || [],
     children: childrenRes.data || [],
   };
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Events (Memorial Calendar)
+// ═══════════════════════════════════════════════════════════════════════════
+
+export async function getEvents(): Promise<Event[]> {
+  const { data, error } = await supabase
+    .from('events')
+    .select('*')
+    .order('event_date', { ascending: true });
+
+  if (error) throw error;
+  return data || [];
+}
+
+export async function getEvent(id: string): Promise<Event | null> {
+  const { data, error } = await supabase
+    .from('events')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw error;
+  }
+  return data;
+}
+
+export async function getEventsByType(eventType: EventType): Promise<Event[]> {
+  const { data, error } = await supabase
+    .from('events')
+    .select('*')
+    .eq('event_type', eventType)
+    .order('event_date', { ascending: true });
+
+  if (error) throw error;
+  return data || [];
+}
+
+export async function createEvent(input: Omit<Event, 'id' | 'created_at'>): Promise<Event> {
+  const { data, error } = await supabase
+    .from('events')
+    .insert(input)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+export async function updateEvent(id: string, input: Partial<Omit<Event, 'id' | 'created_at'>>): Promise<Event> {
+  const { data, error } = await supabase
+    .from('events')
+    .update(input)
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteEvent(id: string): Promise<void> {
+  const { error } = await supabase
+    .from('events')
+    .delete()
+    .eq('id', id);
+
+  if (error) throw error;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Contributions (Edit Suggestions)
+// ═══════════════════════════════════════════════════════════════════════════
+
+export async function getContributions(status?: ContributionStatus): Promise<Contribution[]> {
+  let query = supabase
+    .from('contributions')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (status) {
+    query = query.eq('status', status);
+  }
+
+  const { data, error } = await query;
+  if (error) throw error;
+  return data || [];
+}
+
+export async function getContribution(id: string): Promise<Contribution | null> {
+  const { data, error } = await supabase
+    .from('contributions')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (error) {
+    if (error.code === 'PGRST116') return null;
+    throw error;
+  }
+  return data;
+}
+
+export async function createContribution(input: {
+  author_id: string;
+  target_person: string;
+  change_type: Contribution['change_type'];
+  changes: Record<string, unknown>;
+  reason?: string;
+}): Promise<Contribution> {
+  const { data, error } = await supabase
+    .from('contributions')
+    .insert(input)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+export async function reviewContribution(
+  id: string,
+  status: 'approved' | 'rejected',
+  reviewerId: string,
+  reviewNotes?: string
+): Promise<Contribution> {
+  // First, get the contribution to access changes and target person
+  const { data: contribution, error: fetchError } = await supabase
+    .from('contributions')
+    .select('*')
+    .eq('id', id)
+    .single();
+
+  if (fetchError) throw fetchError;
+
+  // If approving an update, apply the changes to the person record
+  if (status === 'approved' && contribution.change_type === 'update' && contribution.target_person) {
+    const allowedFields = [
+      'display_name', 'first_name', 'middle_name', 'surname',
+      'phone', 'email', 'zalo', 'facebook', 'address', 'hometown',
+      'birth_year', 'death_year', 'death_lunar', 'birth_place', 'death_place',
+      'occupation', 'biography', 'notes',
+    ];
+    const safeChanges: Record<string, unknown> = {};
+    for (const [key, val] of Object.entries(contribution.changes)) {
+      if (allowedFields.includes(key)) {
+        safeChanges[key] = val;
+      }
+    }
+    if (Object.keys(safeChanges).length > 0) {
+      const { error: updateError } = await supabase
+        .from('people')
+        .update({ ...safeChanges, updated_at: new Date().toISOString() })
+        .eq('id', contribution.target_person);
+
+      if (updateError) throw updateError;
+    }
+  }
+
+  // Update the contribution status
+  const { data, error } = await supabase
+    .from('contributions')
+    .update({
+      status,
+      reviewed_by: reviewerId,
+      reviewed_at: new Date().toISOString(),
+      review_notes: reviewNotes,
+    })
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+export async function getContributionsByPerson(personId: string): Promise<Contribution[]> {
+  const { data, error } = await supabase
+    .from('contributions')
+    .select('*')
+    .eq('target_person', personId)
+    .order('created_at', { ascending: false });
+
+  if (error) throw error;
+  return data || [];
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// Media
+// ═══════════════════════════════════════════════════════════════════════════
+
+export async function getMediaByPerson(personId: string): Promise<Media[]> {
+  const { data, error } = await supabase
+    .from('media')
+    .select('*')
+    .eq('person_id', personId)
+    .order('sort_order', { ascending: true });
+
+  if (error) throw error;
+  return data || [];
+}
+
+export async function createMedia(input: CreateMediaInput): Promise<Media> {
+  const { data, error } = await supabase
+    .from('media')
+    .insert(input)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+export async function updateMedia(id: string, input: Partial<CreateMediaInput>): Promise<Media> {
+  const { data, error } = await supabase
+    .from('media')
+    .update(input)
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteMedia(id: string): Promise<void> {
+  const { error } = await supabase
+    .from('media')
+    .delete()
+    .eq('id', id);
+
+  if (error) throw error;
+}
+
+export async function setPrimaryMedia(personId: string, mediaId: string): Promise<void> {
+  // Reset all, then set target. If step 2 fails, restore the previous primary.
+  const { data: previousPrimary } = await supabase
+    .from('media')
+    .select('id')
+    .eq('person_id', personId)
+    .eq('is_primary', true)
+    .maybeSingle();
+
+  const { error: resetError } = await supabase
+    .from('media')
+    .update({ is_primary: false })
+    .eq('person_id', personId);
+
+  if (resetError) throw resetError;
+
+  const { error: setError } = await supabase
+    .from('media')
+    .update({ is_primary: true })
+    .eq('id', mediaId);
+
+  if (setError) {
+    // Restore previous primary on failure
+    if (previousPrimary) {
+      await supabase.from('media').update({ is_primary: true }).eq('id', previousPrimary.id);
+    }
+    throw setError;
+  }
 }

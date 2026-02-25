@@ -2,17 +2,19 @@
  * @project AncestorTree
  * @file src/app/(main)/people/[id]/page.tsx
  * @description Person detail page
- * @version 1.0.0
- * @updated 2026-02-24
+ * @version 2.0.0
+ * @updated 2026-02-25
  */
 
 'use client';
 
 import { use } from 'react';
 import { usePerson, useDeletePerson } from '@/hooks/use-people';
+import { useAuth } from '@/components/auth/auth-provider';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
+import { AvatarUpload } from '@/components/people/avatar-upload';
+import { PhotoGallery } from '@/components/people/photo-gallery';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -28,7 +30,6 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import {
-  User,
   Calendar,
   MapPin,
   Phone,
@@ -54,6 +55,8 @@ export default function PersonDetailPage({ params }: PageProps) {
   const router = useRouter();
   const { data: person, isLoading, error } = usePerson(id);
   const deleteMutation = useDeletePerson();
+  const { isAdmin, profile } = useAuth();
+  const canEdit = isAdmin || profile?.role === 'editor';
 
   const handleDelete = async () => {
     try {
@@ -104,15 +107,6 @@ export default function PersonDetailPage({ params }: PageProps) {
     );
   }
 
-  const initials = person.display_name
-    .split(' ')
-    .map((n) => n[0])
-    .slice(-2)
-    .join('')
-    .toUpperCase();
-
-  const genderColor = person.gender === 1 ? 'bg-blue-100 text-blue-800' : 'bg-pink-100 text-pink-800';
-
   return (
     <div className="container mx-auto p-4 max-w-4xl space-y-6">
       {/* Back button */}
@@ -127,12 +121,7 @@ export default function PersonDetailPage({ params }: PageProps) {
       <Card>
         <CardContent className="p-6">
           <div className="flex flex-col sm:flex-row items-start gap-6">
-            <Avatar className="h-24 w-24">
-              <AvatarImage src={person.avatar_url} alt={person.display_name} />
-              <AvatarFallback className={`${genderColor} text-2xl`}>
-                {initials || <User className="h-10 w-10" />}
-              </AvatarFallback>
-            </Avatar>
+            <AvatarUpload person={person} canEdit={canEdit} />
 
             <div className="flex-1">
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
@@ -156,39 +145,41 @@ export default function PersonDetailPage({ params }: PageProps) {
                 </p>
               )}
 
-              <div className="flex gap-2 mt-4">
-                <Button asChild size="sm">
-                  <Link href={`/people/${id}/edit`}>
-                    <Pencil className="h-4 w-4 mr-2" />
-                    Chỉnh sửa
-                  </Link>
-                </Button>
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button variant="destructive" size="sm">
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Xóa
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>Xác nhận xóa?</AlertDialogTitle>
-                      <AlertDialogDescription>
-                        Bạn có chắc muốn xóa {person.display_name}? Hành động này không thể hoàn tác.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Hủy</AlertDialogCancel>
-                      <AlertDialogAction 
-                        onClick={handleDelete}
-                        disabled={deleteMutation.isPending}
-                      >
-                        {deleteMutation.isPending ? 'Đang xóa...' : 'Xóa'}
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </div>
+              {canEdit && (
+                <div className="flex gap-2 mt-4">
+                  <Button asChild size="sm">
+                    <Link href={`/people/${id}/edit`}>
+                      <Pencil className="h-4 w-4 mr-2" />
+                      Chỉnh sửa
+                    </Link>
+                  </Button>
+                  <AlertDialog>
+                    <AlertDialogTrigger asChild>
+                      <Button variant="destructive" size="sm">
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Xóa
+                      </Button>
+                    </AlertDialogTrigger>
+                    <AlertDialogContent>
+                      <AlertDialogHeader>
+                        <AlertDialogTitle>Xác nhận xóa?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                          Bạn có chắc muốn xóa {person.display_name}? Hành động này không thể hoàn tác.
+                        </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                        <AlertDialogCancel>Hủy</AlertDialogCancel>
+                        <AlertDialogAction
+                          onClick={handleDelete}
+                          disabled={deleteMutation.isPending}
+                        >
+                          {deleteMutation.isPending ? 'Đang xóa...' : 'Xóa'}
+                        </AlertDialogAction>
+                      </AlertDialogFooter>
+                    </AlertDialogContent>
+                  </AlertDialog>
+                </div>
+              )}
             </div>
           </div>
         </CardContent>
@@ -327,6 +318,9 @@ export default function PersonDetailPage({ params }: PageProps) {
           </CardContent>
         </Card>
       )}
+
+      {/* Photo Gallery */}
+      <PhotoGallery personId={id} canEdit={canEdit} />
     </div>
   );
 }

@@ -2,8 +2,8 @@
 project: AncestorTree
 path: docs/04-build/SPRINT-PLAN.md
 type: build
-version: 1.0.0
-updated: 2026-02-24
+version: 1.2.0
+updated: 2026-02-25
 owner: "@pm"
 status: approved
 ---
@@ -13,20 +13,22 @@ status: approved
 ## 📅 Sprint Overview
 
 ```
-Timeline: Feb 24 → Mar 28, 2026 (5 weeks)
+Timeline: Feb 24 → Apr 4, 2026 (6 weeks)
 
-Sprint 1 ████████░░░░░░░░░░░░░░░░░ Week 1 (Feb 24-28)
-Sprint 2 ░░░░░░░░████████░░░░░░░░░ Week 2 (Mar 3-7)
-Sprint 3 ░░░░░░░░░░░░░░░░████████░ Week 3 (Mar 10-14)
-Sprint 4 ░░░░░░░░░░░░░░░░░░░░░░░░█ Week 4 (Mar 17-21)
-Sprint 5 ░░░░░░░░░░░░░░░░░░░░░░░░░ Week 5 (Mar 24-28)
+Sprint 1 ████████░░░░░░░░░░░░░░░░░░░░░░ Week 1 (Feb 24-28)
+Sprint 2 ░░░░░░░░████████░░░░░░░░░░░░░░ Week 2 (Mar 3-7)
+Sprint 3 ░░░░░░░░░░░░░░░░████████░░░░░░ Week 3 (Mar 10-14)
+Sprint 4 ░░░░░░░░░░░░░░░░░░░░░░░░██████ Week 4 (Mar 17-21)
+Sprint 5 ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ Week 5 (Mar 24-28)
+Sprint 6 ░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░ Week 6 (Mar 31-Apr 4)
 
 Milestones:
 ├── v0.1.0 Alpha    → End Sprint 1
 ├── v0.5.0 Beta     → End Sprint 2
 ├── v1.0.0 MVP      → End Sprint 3
 ├── v1.1.0 Enhanced → End Sprint 4
-└── v1.2.0 Release  → End Sprint 5
+├── v1.2.0 Release  → End Sprint 5
+└── v1.3.0 Culture  → End Sprint 6
 ```
 
 ---
@@ -306,6 +308,103 @@ Milestones:
 
 ---
 
+## 🏃 Sprint 6: Culture & Community (5 days)
+
+**Dates:** Mar 31 - Apr 4, 2026
+**Goal:** Achievement honors + Education fund + Family charter
+**Version:** v1.3.0-culture
+
+### Prerequisites (from Sprint 4-5)
+
+> Sprint 6 has FK dependencies on `people` and `profiles` tables (Sprint 1-2) which are stable.
+> Sprint 4 features (Directory, Events, Contributions) are partially implemented (placeholder pages + data layer).
+> Sprint 5 features (GEDCOM, Book, Photos) are independent and do NOT block Sprint 6.
+>
+> **Decision:** Sprint 6 can proceed in parallel. Sprint 4 remaining work (UI polish) and Sprint 5
+> will be scheduled as Sprint 7 backlog after Sprint 6 is complete.
+
+### Migration Strategy
+
+> **DO NOT** modify `database-setup.sql` directly. Create a separate migration file:
+> `frontend/supabase/sprint6-migration.sql` with all new tables, RLS policies, and indexes.
+>
+> **Data layer:** Split new functions into separate modules to avoid bloating `supabase-data.ts`:
+> - `supabase-data-achievements.ts`
+> - `supabase-data-fund.ts`
+> - `supabase-data-charter.ts`
+
+### Tasks
+
+| Day | Task | Hours | Owner | Status |
+|-----|------|-------|-------|--------|
+| **Day 1: Database + Types + Data Layer** | | | | |
+| | DB migration: CREATE tables (achievements, fund_transactions, scholarships, clan_articles) | 1.5h | @fullstack | ⬜ |
+| | DB migration: RLS policies for 4 new tables | 1h | @fullstack | ⬜ |
+| | DB migration: Indexes (person, category, status, date) | 0.5h | @fullstack | ⬜ |
+| | TypeScript types: Achievement, FundTransaction, Scholarship, ClanArticle + enums | 1h | @fullstack | ⬜ |
+| | Data layer: supabase-data-achievements.ts (~8 functions) | 1.5h | @fullstack | ⬜ |
+| | Data layer: supabase-data-fund.ts (~8 functions) | 1.5h | @fullstack | ⬜ |
+| **Day 2: Data Layer (cont.) + Achievement UI** | | | | |
+| | Data layer: supabase-data-charter.ts (~8 functions) | 1h | @fullstack | ⬜ |
+| | React Query hooks: use-achievements.ts, use-fund.ts, use-clan-articles.ts | 1.5h | @fullstack | ⬜ |
+| | Achievement honors page (featured + list) | 2h | @fullstack | ⬜ |
+| | Achievement category filters (hoc_tap, su_nghiep, cong_hien) | 1h | @fullstack | ⬜ |
+| | Achievement detail card component | 1h | @fullstack | ⬜ |
+| **Day 3: Fund Dashboard + Scholarships** | | | | |
+| | Education fund dashboard (balance, stats) | 2h | @fullstack | ⬜ |
+| | Scholarship list with tabs (hoc_bong, khen_thuong) | 1.5h | @fullstack | ⬜ |
+| | Donation history & contribution form | 1.5h | @fullstack | ⬜ |
+| | Admin: achievement management CRUD | 2h | @fullstack | ⬜ |
+| **Day 4: Charter + Admin Pages** | | | | |
+| | Family charter page with tabs (gia_huan, quy_uoc, loi_dan) | 2h | @fullstack | ⬜ |
+| | Rich text article display component | 1h | @fullstack | ⬜ |
+| | Admin: fund & scholarship management | 2h | @fullstack | ⬜ |
+| | Admin: charter article management CRUD | 1.5h | @fullstack | ⬜ |
+| **Day 5: Integration + Testing** | | | | |
+| | Sidebar navigation update (3 new sections) | 0.5h | @fullstack | ⬜ |
+| | Homepage integration (honors + fund summary + featured charter) | 1.5h | @fullstack | ⬜ |
+| | Annual report views (achievements + fund) | 1h | @fullstack | ⬜ |
+| | Sprint 6 testing & fixes | 2h | @fullstack | ⬜ |
+| | Documentation update | 0.5h | @fullstack | ⬜ |
+
+### Hour Summary
+
+| Day | Total | Focus |
+|-----|-------|-------|
+| Day 1 | 7h | DB migration + Types + Data layer (achievements, fund) |
+| Day 2 | 6.5h | Data layer (charter) + Hooks + Achievement UI |
+| Day 3 | 7h | Fund dashboard + Scholarships + Admin achievements |
+| Day 4 | 6.5h | Charter page + Admin fund & charter |
+| Day 5 | 5.5h | Integration + Testing + Docs |
+| **Total** | **32.5h** | |
+
+### Deliverables
+
+- [ ] DB migration file with 4 tables, RLS policies, indexes
+- [ ] TypeScript types + enums for all Sprint 6 entities
+- [ ] Data layer modules (3 files) + React Query hooks (3 files)
+- [ ] Achievement honors page with category filters
+- [ ] Education fund dashboard with balance tracking
+- [ ] Scholarship & reward management
+- [ ] Family charter page with 3 article categories
+- [ ] Admin CRUD for all 3 features
+- [ ] Homepage integration (honors + fund + charter)
+
+### Exit Criteria
+
+```
+✅ sprint6-migration.sql applies without errors
+✅ Achievements display with category filters
+✅ Fund dashboard shows balance and transactions
+✅ Scholarships can be created, approved, and paid
+✅ Charter articles display with category tabs
+✅ Admin can manage all new content
+✅ Sidebar shows 3 new navigation sections
+✅ pnpm build passes without errors
+```
+
+---
+
 ## 📊 Sprint Summary
 
 | Sprint | Focus | Key Deliverables | LOC Est. |
@@ -315,34 +414,39 @@ Milestones:
 | **Sprint 3** | MVP | Interactive Tree, Admin, Deploy | ~2,500 |
 | **Sprint 4** | Enhanced | Directory, Calendar, Contributions | ~2,500 |
 | **Sprint 5** | Polish | GEDCOM, Book, Photos, Release | ~2,000 |
-| **Total** | | | **~12,000** |
+| **Sprint 6** | Culture | Honors, Fund, Scholarships, Charter | ~3,000 |
+| **Total** | | | **~15,000** |
 
 ---
 
 ## 📋 Feature Completion Matrix
 
-| Feature | S1 | S2 | S3 | S4 | S5 |
-|---------|:--:|:--:|:--:|:--:|:--:|
-| Project Setup | ✅ | | | | |
-| Database Schema | ✅ | | | | |
-| Auth (Login/Register) | ✅ | | | | |
-| Layout & Navigation | ✅ | | | | |
-| People CRUD | | ✅ | | | |
-| Family Relationships | | ✅ | | | |
-| Search & Filter | | ✅ | | | |
-| Basic Tree View | | ✅ | | | |
-| Interactive Tree | | | ✅ | | |
-| Admin Panel | | | ✅ | | |
-| Homepage & Stats | | | ✅ | | |
-| MVP Deploy | | | ✅ | | |
-| Directory | | | | ✅ | |
-| Memorial Calendar | | | | ✅ | |
-| Lunar Calendar | | | | ✅ | |
-| Contributions | | | | ✅ | |
-| GEDCOM Export | | | | | ✅ |
-| Book Generator | | | | | ✅ |
-| Photo Upload | | | | | ✅ |
-| Final Release | | | | | ✅ |
+| Feature | S1 | S2 | S3 | S4 | S5 | S6 |
+|---------|:--:|:--:|:--:|:--:|:--:|:--:|
+| Project Setup | ✅ | | | | | |
+| Database Schema | ✅ | | | | | |
+| Auth (Login/Register) | ✅ | | | | | |
+| Layout & Navigation | ✅ | | | | | |
+| People CRUD | | ✅ | | | | |
+| Family Relationships | | ✅ | | | | |
+| Search & Filter | | ✅ | | | | |
+| Basic Tree View | | ✅ | | | | |
+| Interactive Tree | | | ✅ | | | |
+| Admin Panel | | | ✅ | | | |
+| Homepage & Stats | | | ✅ | | | |
+| MVP Deploy | | | ✅ | | | |
+| Directory | | | | ✅ | | |
+| Memorial Calendar | | | | ✅ | | |
+| Lunar Calendar | | | | ✅ | | |
+| Contributions | | | | ✅ | | |
+| GEDCOM Export | | | | | ✅ | |
+| Book Generator | | | | | ✅ | |
+| Photo Upload | | | | | ✅ | |
+| Final Release | | | | | ✅ | |
+| Achievement Honors | | | | | | ✅ |
+| Education Fund | | | | | | ✅ |
+| Scholarships & Rewards | | | | | | ✅ |
+| Family Charter | | | | | | ✅ |
 
 ---
 
@@ -362,6 +466,11 @@ Milestones:
 | S4 | Contributions | ✅ Workflow complete |
 | S5 | GEDCOM | ✅ Valid export |
 | S5 | Performance | ✅ Lighthouse >90 |
+| S6 | DB migration | ✅ sprint6-migration.sql applies cleanly |
+| S6 | Achievements | ✅ Honors page with filters |
+| S6 | Fund | ✅ Dashboard with balance |
+| S6 | Charter | ✅ Articles with categories |
+| S6 | Build | ✅ pnpm build passes |
 
 ### Final Release
 
@@ -474,5 +583,7 @@ pnpm dlx shadcn@latest init
 ---
 
 **Status:** 🟢 Ready for Implementation
+
+*Updated: Sprint 6 added for Culture & Community features (v1.3.0)*
 
 *SDLC Framework 6.1.1 - Stage 04 Build*

@@ -12,9 +12,10 @@ status: approved
 
 ## 1. Document Control
 
-| Version | Date | Author | Changes |
-|---------|------|--------|---------|
-| 1.0.0 | 2026-02-24 | @dev-team | Initial draft |
+| Version | Date       | Author    | Changes                                           |
+|---------|------------|-----------|---------------------------------------------------|
+| 1.0.0   | 2026-02-24 | @dev-team | Initial draft                                     |
+| 1.1.0   | 2026-02-25 | @pm       | Add Vinh danh, Quỹ khuyến học, Hương ước         |
 
 ---
 
@@ -100,6 +101,16 @@ status: approved
 ---
 
 ## 3. Database Design
+
+### 3.0 Migration Strategy
+
+> **Core tables** (people, families, children, profiles, contributions, events, media) are defined in
+> `frontend/supabase/database-setup.sql`.
+>
+> **v1.1 tables** (achievements, fund_transactions, scholarships, clan_articles) MUST be created in a
+> separate migration file: `frontend/supabase/sprint6-migration.sql`.
+>
+> See [SPRINT-PLAN.md](../04-build/SPRINT-PLAN.md) Sprint 6 > Migration Strategy for details.
 
 ### 3.1 Entity Relationship Diagram (ERD)
 
@@ -231,6 +242,69 @@ status: approved
 │    │ recurring       BOOLEAN            │◄── Yearly recurring
 │    │ created_at      TIMESTAMPTZ        │
 └──────────────────────────────────────────┘
+
+┌──────────────────────────────────────────┐
+│            achievements                  │
+├──────────────────────────────────────────┤
+│ PK │ id              UUID               │
+│ FK │ person_id       UUID → people      │◄── Người được vinh danh
+│    │ title           VARCHAR(255)       │◄── Tên thành tích
+│    │ category        VARCHAR(50)        │◄── 'hoc_tap'|'su_nghiep'|'cong_hien'|'other'
+│    │ description     TEXT               │
+│    │ year            INTEGER            │◄── Năm đạt thành tích
+│    │ awarded_by      VARCHAR(255)       │◄── Đơn vị trao tặng
+│    │ is_featured     BOOLEAN            │◄── Hiển thị nổi bật
+│    │ created_at      TIMESTAMPTZ        │
+│    │ updated_at      TIMESTAMPTZ        │
+└──────────────────────────────────────────┘
+
+┌──────────────────────────────────────────┐
+│          fund_transactions               │
+├──────────────────────────────────────────┤
+│ PK │ id              UUID               │
+│    │ type            VARCHAR(20)        │◄── 'income'|'expense'
+│    │ category        VARCHAR(50)        │◄── 'dong_gop'|'hoc_bong'|'khen_thuong'|'other'
+│    │ amount          DECIMAL(12,0)      │◄── Số tiền (VND)
+│    │ donor_name      VARCHAR(255)       │◄── Tên người đóng góp (income)
+│ FK │ donor_person_id UUID → people      │◄── Link tới thành viên (optional)
+│ FK │ recipient_id    UUID → people      │◄── Người nhận (expense)
+│    │ description     TEXT               │
+│    │ transaction_date DATE              │
+│    │ academic_year   VARCHAR(20)        │◄── Năm học: "2025-2026"
+│    │ created_by      UUID → profiles   │◄── Admin tạo
+│    │ created_at      TIMESTAMPTZ        │
+└──────────────────────────────────────────┘
+
+┌──────────────────────────────────────────┐
+│            scholarships                  │
+├──────────────────────────────────────────┤
+│ PK │ id              UUID               │
+│ FK │ person_id       UUID → people      │◄── Người được cấp
+│    │ type            VARCHAR(20)        │◄── 'hoc_bong'|'khen_thuong'
+│    │ amount          DECIMAL(12,0)      │◄── Số tiền
+│    │ reason          TEXT               │◄── Lý do cấp
+│    │ academic_year   VARCHAR(20)        │◄── Năm học
+│    │ school          VARCHAR(255)       │◄── Trường đang học
+│    │ grade_level     VARCHAR(50)        │◄── Lớp/bậc học
+│    │ status          VARCHAR(20)        │◄── 'pending'|'approved'|'paid'
+│    │ approved_by     UUID → profiles   │
+│    │ approved_at     TIMESTAMPTZ        │
+│    │ created_at      TIMESTAMPTZ        │
+└──────────────────────────────────────────┘
+
+┌──────────────────────────────────────────┐
+│          clan_articles                   │
+├──────────────────────────────────────────┤
+│ PK │ id              UUID               │
+│    │ title           VARCHAR(255)       │◄── Tiêu đề bài viết
+│    │ content         TEXT               │◄── Nội dung (markdown)
+│    │ category        VARCHAR(50)        │◄── 'gia_huan'|'quy_uoc'|'loi_dan'
+│    │ sort_order      INTEGER            │◄── Thứ tự hiển thị
+│    │ is_featured     BOOLEAN            │◄── Hiển thị trên trang chủ
+│    │ author_id       UUID → profiles   │◄── Người viết
+│    │ created_at      TIMESTAMPTZ        │
+│    │ updated_at      TIMESTAMPTZ        │
+└──────────────────────────────────────────┘
 ```
 
 ### 3.2 Table Details
@@ -333,6 +407,98 @@ CREATE INDEX idx_children_family ON children(family_id);
 CREATE INDEX idx_children_person ON children(person_id);
 ```
 
+#### 3.2.4 `achievements` Table (v1.1)
+
+```sql
+CREATE TABLE achievements (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    person_id       UUID NOT NULL REFERENCES people(id) ON DELETE CASCADE,
+    title           VARCHAR(255) NOT NULL,
+    category        VARCHAR(50) NOT NULL CHECK (category IN ('hoc_tap', 'su_nghiep', 'cong_hien', 'other')),
+    description     TEXT,
+    year            INTEGER,
+    awarded_by      VARCHAR(255),
+    is_featured     BOOLEAN DEFAULT false,
+    created_at      TIMESTAMPTZ DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Indexes
+CREATE INDEX idx_achievements_person ON achievements(person_id);
+CREATE INDEX idx_achievements_category ON achievements(category);
+CREATE INDEX idx_achievements_year ON achievements(year);
+```
+
+#### 3.2.5 `fund_transactions` Table (v1.1)
+
+```sql
+CREATE TABLE fund_transactions (
+    id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    type              VARCHAR(20) NOT NULL CHECK (type IN ('income', 'expense')),
+    category          VARCHAR(50) NOT NULL CHECK (category IN ('dong_gop', 'hoc_bong', 'khen_thuong', 'other')),
+    amount            DECIMAL(12, 0) NOT NULL CHECK (amount > 0),
+    donor_name        VARCHAR(255),          -- For income: donor display name
+    donor_person_id   UUID REFERENCES people(id) ON DELETE SET NULL,
+    recipient_id      UUID REFERENCES people(id) ON DELETE SET NULL,
+    description       TEXT,
+    transaction_date  DATE NOT NULL DEFAULT CURRENT_DATE,
+    academic_year     VARCHAR(20),           -- e.g. "2025-2026"
+    created_by        UUID REFERENCES profiles(id),
+    created_at        TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Indexes
+CREATE INDEX idx_fund_tx_type ON fund_transactions(type);
+CREATE INDEX idx_fund_tx_category ON fund_transactions(category);
+CREATE INDEX idx_fund_tx_date ON fund_transactions(transaction_date);
+CREATE INDEX idx_fund_tx_academic_year ON fund_transactions(academic_year);
+```
+
+#### 3.2.6 `scholarships` Table (v1.1)
+
+```sql
+CREATE TABLE scholarships (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    person_id       UUID NOT NULL REFERENCES people(id) ON DELETE CASCADE,
+    type            VARCHAR(20) NOT NULL CHECK (type IN ('hoc_bong', 'khen_thuong')),
+    amount          DECIMAL(12, 0) NOT NULL CHECK (amount > 0),
+    reason          TEXT,
+    academic_year   VARCHAR(20) NOT NULL,    -- e.g. "2025-2026"
+    school          VARCHAR(255),
+    grade_level     VARCHAR(50),             -- e.g. "Lớp 10", "Đại học năm 3"
+    status          VARCHAR(20) DEFAULT 'pending' CHECK (status IN ('pending', 'approved', 'paid')),
+    approved_by     UUID REFERENCES profiles(id),
+    approved_at     TIMESTAMPTZ,
+    created_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Indexes
+CREATE INDEX idx_scholarships_person ON scholarships(person_id);
+CREATE INDEX idx_scholarships_type ON scholarships(type);
+CREATE INDEX idx_scholarships_status ON scholarships(status);
+CREATE INDEX idx_scholarships_year ON scholarships(academic_year);
+```
+
+#### 3.2.7 `clan_articles` Table (v1.1)
+
+```sql
+CREATE TABLE clan_articles (
+    id              UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    title           VARCHAR(255) NOT NULL,
+    content         TEXT NOT NULL,            -- Markdown content
+    category        VARCHAR(50) NOT NULL CHECK (category IN ('gia_huan', 'quy_uoc', 'loi_dan')),
+    sort_order      INTEGER DEFAULT 0,
+    is_featured     BOOLEAN DEFAULT false,    -- Show on homepage
+    author_id       UUID REFERENCES profiles(id),
+    created_at      TIMESTAMPTZ DEFAULT NOW(),
+    updated_at      TIMESTAMPTZ DEFAULT NOW()
+);
+
+-- Indexes
+CREATE INDEX idx_clan_articles_category ON clan_articles(category);
+CREATE INDEX idx_clan_articles_sort ON clan_articles(sort_order);
+```
+
 ### 3.3 Row Level Security (RLS)
 
 ```sql
@@ -420,6 +586,27 @@ export async function getDescendants(personId: string): Promise<Person[]>
 export async function searchPeople(query: string): Promise<Person[]>
 export async function getPeopleByGeneration(gen: number): Promise<Person[]>
 export async function getMemorialDates(): Promise<Event[]>
+
+// Achievements (v1.1)
+export async function getAchievements(personId?: string): Promise<Achievement[]>
+export async function createAchievement(data: CreateAchievementInput): Promise<Achievement>
+export async function updateAchievement(id: string, data: UpdateAchievementInput): Promise<Achievement>
+export async function deleteAchievement(id: string): Promise<void>
+
+// Education Fund (v1.1)
+export async function getFundTransactions(filters?: FundFilters): Promise<FundTransaction[]>
+export async function createFundTransaction(data: CreateFundTxInput): Promise<FundTransaction>
+export async function getFundBalance(): Promise<{ income: number; expense: number; balance: number }>
+export async function getScholarships(filters?: ScholarshipFilters): Promise<Scholarship[]>
+export async function createScholarship(data: CreateScholarshipInput): Promise<Scholarship>
+export async function updateScholarshipStatus(id: string, status: string, reviewerId: string): Promise<Scholarship>
+
+// Clan Articles - Hương ước (v1.1)
+export async function getClanArticles(category?: string): Promise<ClanArticle[]>
+export async function getClanArticle(id: string): Promise<ClanArticle | null>
+export async function createClanArticle(data: CreateArticleInput): Promise<ClanArticle>
+export async function updateClanArticle(id: string, data: UpdateArticleInput): Promise<ClanArticle>
+export async function deleteClanArticle(id: string): Promise<void>
 ```
 
 ### 4.2 React Query Hooks
@@ -486,10 +673,16 @@ src/
 │   │   │   └── [id]/page.tsx     # Person detail
 │   │   ├── directory/page.tsx    # Contact directory
 │   │   ├── events/page.tsx       # Memorial calendar
+│   │   ├── achievements/page.tsx # Achievement honors (v1.1)
+│   │   ├── fund/page.tsx         # Education fund dashboard (v1.1)
+│   │   ├── charter/page.tsx      # Hương ước / Clan rules (v1.1)
 │   │   ├── book/page.tsx         # Genealogy book
 │   │   └── admin/
 │   │       ├── page.tsx          # Admin dashboard
 │   │       ├── users/page.tsx    # User management
+│   │       ├── achievements/     # Manage achievements (v1.1)
+│   │       ├── fund/             # Manage fund & scholarships (v1.1)
+│   │       ├── charter/          # Manage clan articles (v1.1)
 │   │       └── settings/page.tsx # Settings
 │   ├── api/                      # API routes (if needed)
 │   ├── layout.tsx                # Root layout

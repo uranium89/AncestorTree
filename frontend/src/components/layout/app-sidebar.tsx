@@ -2,8 +2,8 @@
  * @project AncestorTree
  * @file src/components/layout/app-sidebar.tsx
  * @description Main navigation sidebar component
- * @version 1.0.0
- * @updated 2026-02-24
+ * @version 2.0.0
+ * @updated 2026-02-25
  */
 
 'use client';
@@ -41,6 +41,9 @@ import {
   ClipboardList,
   LogOut,
   ChevronUp,
+  Trophy,
+  BookOpen,
+  ScrollText,
 } from 'lucide-react';
 import { useAuth } from '@/components/auth/auth-provider';
 
@@ -50,6 +53,10 @@ const mainNavItems = [
   { title: 'Thành viên', url: '/people', icon: Users },
   { title: 'Danh bạ', url: '/directory', icon: BookUser },
   { title: 'Lịch cúng lễ', url: '/events', icon: Calendar },
+  { title: 'Đề xuất', url: '/contributions', icon: ClipboardList },
+  { title: 'Vinh danh', url: '/achievements', icon: Trophy },
+  { title: 'Quỹ khuyến học', url: '/fund', icon: BookOpen },
+  { title: 'Hương ước', url: '/charter', icon: ScrollText },
   { title: 'Tài liệu', url: '/documents', icon: FileText },
 ];
 
@@ -57,11 +64,14 @@ const adminNavItems = [
   { title: 'Bảng điều khiển', url: '/admin', icon: Settings },
   { title: 'Người dùng', url: '/admin/users', icon: UserCog },
   { title: 'Đề xuất chỉnh sửa', url: '/admin/contributions', icon: ClipboardList },
+  { title: 'QL Vinh danh', url: '/admin/achievements', icon: Trophy },
+  { title: 'QL Quỹ & Học bổng', url: '/admin/fund', icon: BookOpen },
+  { title: 'QL Hương ước', url: '/admin/charter', icon: ScrollText },
 ];
 
 export function AppSidebar() {
   const pathname = usePathname();
-  const { user, profile, isAdmin, signOut } = useAuth();
+  const { user, profile, isAdmin, isEditor, signOut } = useAuth();
 
   const getInitials = (name?: string) => {
     if (!name) return 'U';
@@ -89,7 +99,7 @@ export function AppSidebar() {
             <SidebarMenu>
               {mainNavItems.map((item) => (
                 <SidebarMenuItem key={item.url}>
-                  <SidebarMenuButton asChild isActive={pathname === item.url}>
+                  <SidebarMenuButton asChild isActive={item.url === '/' ? pathname === '/' : pathname.startsWith(item.url)}>
                     <Link href={item.url}>
                       <item.icon className="h-4 w-4" />
                       <span>{item.title}</span>
@@ -101,14 +111,14 @@ export function AppSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
 
-        {isAdmin && (
+        {(isAdmin || isEditor) && (
           <SidebarGroup>
             <SidebarGroupLabel>Quản trị</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
                 {adminNavItems.map((item) => (
                   <SidebarMenuItem key={item.url}>
-                    <SidebarMenuButton asChild isActive={pathname === item.url}>
+                    <SidebarMenuButton asChild isActive={item.url === '/admin' ? pathname === '/admin' : pathname.startsWith(item.url)}>
                       <Link href={item.url}>
                         <item.icon className="h-4 w-4" />
                         <span>{item.title}</span>

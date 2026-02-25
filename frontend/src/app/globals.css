@@ -124,3 +124,45 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Print styles for book view and general printing */
+@media print {
+  header,
+  nav,
+  [data-sidebar],
+  .no-print {
+    display: none !important;
+  }
+
+  body {
+    background: white !important;
+    color: black !important;
+    font-size: 12pt;
+    line-height: 1.6;
+  }
+
+  .book-chapter {
+    page-break-before: always;
+  }
+
+  .book-chapter:first-child {
+    page-break-before: avoid;
+  }
+
+  .book-person {
+    page-break-inside: avoid;
+  }
+
+  .book-cover {
+    page-break-after: always;
+  }
+
+  .book-toc {
+    page-break-after: always;
+  }
+
+  @page {
+    margin: 2cm;
+    size: A4;
+  }
+}

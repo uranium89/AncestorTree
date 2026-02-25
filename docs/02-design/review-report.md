@@ -2,8 +2,8 @@
 project: AncestorTree
 path: docs/02-design/review-report.md
 type: design
-version: 1.0.0
-updated: 2026-02-24
+version: 1.1.0
+updated: 2026-02-25
 owner: "@reviewer"
 status: approved
 ---
@@ -16,21 +16,22 @@ status: approved
 
 | Stage | Documents | Quality | Status |
 |-------|-----------|---------|--------|
-| **00-Foundation** | 3 docs | ⭐⭐⭐⭐⭐ Excellent | ✅ APPROVED |
+| **00-Foundation** | 4 docs | ⭐⭐⭐⭐⭐ Excellent | ✅ APPROVED |
 | **01-Planning** | 2 docs | ⭐⭐⭐⭐⭐ Excellent | ✅ APPROVED |
-| **02-Design** | 2 docs | ⭐⭐⭐⭐⭐ Excellent | ✅ APPROVED |
+| **02-Design** | 3 docs | ⭐⭐⭐⭐⭐ Excellent | ✅ APPROVED |
 
-**Verdict:** 🟢 **ALL STAGES APPROVED** - Ready for Sprint 1
+**Verdict:** 🟢 **ALL STAGES APPROVED** - Ready for Sprint 6
 
 ### 1.2 Documentation Statistics
 
 | Metric | Value |
 |--------|-------|
-| **Total Documents** | 7 |
-| **Total Lines** | 3,236 |
-| **Total Size** | ~125KB |
-| **Requirement IDs** | 45+ (FR-xxx, NFR-xx) |
-| **Tables** | 80+ |
+| **Total Documents** | 9 |
+| **Total Lines** | ~4,000 |
+| **Total Size** | ~150KB |
+| **Requirement IDs** | 77 FRs + 17 NFRs |
+| **Database Tables** | 11 (7 core + 4 v1.1) |
+| **Tables** | 100+ |
 | **Diagrams** | 15+ (ASCII art) |
 
 ---
@@ -104,10 +105,11 @@ status: approved
 | **Traceability** | ✅ | IDs for all requirements |
 
 **Strengths:**
-- Comprehensive functional requirements (FR-101 to FR-1003)
+- Comprehensive functional requirements (FR-101 to FR-1406)
 - Vietnamese cultural features as separate epic (FR-901 to FR-906)
 - Priority levels (P0/P1/P2/P3) well assigned
 - Market research reference linked
+- v1.1 additions: 3 new epics from competitive analysis (gen3.vn)
 
 **Requirements Coverage:**
 
@@ -123,6 +125,9 @@ status: approved
 | Directory | 3 | 0 P0, 3 P1 |
 | Vietnamese Features | 6 | 0 P0, 3 P1, 3 P2 |
 | GEDCOM | 3 | 0 P0, 1 P1, 1 P2, 1 P3 |
+| **Achievement Honors** (v1.1) | 6 | 0 P0, 6 P1 |
+| **Education Fund** (v1.1) | 8 | 0 P0, 8 P1 |
+| **Family Charter** (v1.1) | 6 | 0 P0, 6 P1 |
 
 ### 3.2 Roadmap ✅
 
@@ -158,11 +163,11 @@ status: approved
 | **Deployment architecture** | ✅ | CI/CD flow |
 
 **Strengths:**
-- Comprehensive ERD with 7 tables
-- Full SQL schema with indexes
+- Comprehensive ERD with 11 tables (7 core + 4 v1.1)
+- Full SQL schema with indexes and RLS policies
 - Vietnamese-specific fields (death_lunar, chi, is_patrilineal)
-- RLS policies documented
 - Tree layout algorithm explained
+- v1.1 migration strategy documented
 
 **Database Tables:**
 1. `people` - Core entity (30+ fields)
@@ -172,6 +177,10 @@ status: approved
 5. `contributions` - Edit workflow
 6. `media` - Photos/documents
 7. `events` - Memorial dates
+8. `achievements` - Vinh danh (v1.1)
+9. `fund_transactions` - Quỹ khuyến học (v1.1)
+10. `scholarships` - Học bổng/khen thưởng (v1.1)
+11. `clan_articles` - Hương ước (v1.1)
 
 ### 4.2 UI/UX Design ✅
 
@@ -326,19 +335,20 @@ The documentation is comprehensive, well-structured, and SDLC-compliant. The tea
 
 ## Appendix: Document Inventory
 
-| # | Document | Path | Lines | Size |
-|---|----------|------|-------|------|
-| 1 | Problem Statement | `docs/00-foundation/problem-statement.md` | 174 | ~5KB |
-| 2 | Business Case | `docs/00-foundation/business-case.md` | 241 | ~7KB |
-| 3 | Market Research | `docs/00-foundation/market-research.md` | 433 | ~11KB |
-| 4 | BRD | `docs/01-planning/BRD.md` | 330 | ~12KB |
-| 5 | Roadmap | `docs/01-planning/roadmap.md` | 275 | ~7KB |
-| 6 | Technical Design | `docs/02-design/technical-design.md` | 865 | ~38KB |
-| 7 | UI/UX Design | `docs/02-design/ui-ux-design.md` | 813 | ~39KB |
-| 8 | Review Report | `docs/02-design/review-report.md` | ~400 | ~15KB |
-| **Total** | | | **~3,500** | **~134KB** |
+| # | Document | Path | Version | Size |
+|---|----------|------|---------|------|
+| 1 | Vision & Scope | `docs/00-foundation/VISION.md` | 1.0.0 | ~6KB |
+| 2 | Problem Statement | `docs/00-foundation/problem-statement.md` | 1.0.0 | ~5KB |
+| 3 | Business Case | `docs/00-foundation/business-case.md` | 1.0.0 | ~7KB |
+| 4 | Market Research | `docs/00-foundation/market-research.md` | 1.0.0 | ~11KB |
+| 5 | BRD | `docs/01-planning/BRD.md` | 1.1.0 | ~12KB |
+| 6 | Roadmap | `docs/01-planning/roadmap.md` | 1.1.0 | ~8KB |
+| 7 | Technical Design | `docs/02-design/technical-design.md` | 1.1.0 | ~38KB |
+| 8 | UI/UX Design | `docs/02-design/ui-ux-design.md` | 1.1.0 | ~39KB |
+| 9 | Review Report | `docs/02-design/review-report.md` | 1.1.0 | ~15KB |
+| **Total** | | | | **~141KB** |
 
 ---
 
-*Review completed: 2026-02-24*
+*Review completed: 2026-02-24 (v1.0.0), updated 2026-02-25 (v1.1.0 — Sprint 6 features)*
 *SDLC Framework 6.1.1 Compliant*

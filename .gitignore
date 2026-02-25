@@ -35,3 +35,6 @@ npm-debug.log*
 # Testing
 coverage/
 .nyc_output/
+
+# Community posts (internal only, not for public repo)
+docs/00-foundation/06-Community/
