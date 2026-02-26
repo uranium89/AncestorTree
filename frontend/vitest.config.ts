@@ -21,7 +21,6 @@ export default defineConfig({
       exclude: ['src/app/api/desktop-db/__tests__/**'],
     },
     // Sequential to avoid multiple sql.js WASM initializations competing
-    maxForks: 1,
     testTimeout: 15000,
   },
   resolve: {
