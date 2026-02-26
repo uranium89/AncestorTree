@@ -68,6 +68,9 @@ app.whenReady().then(async () => {
   createWindow();
   await loadApp();
 
+  // TODO Phase 2: runMigrations() — run SQLite migrations before starting server
+  // await runMigrations(getDataDir());
+
   // Start Next.js server
   try {
     const url = await startServer();
@@ -96,7 +99,7 @@ app.whenReady().then(async () => {
   app.on('activate', () => {
     if (BrowserWindow.getAllWindows().length === 0) {
       createWindow();
-      loadApp();
+      void loadApp();
     }
   });
 });

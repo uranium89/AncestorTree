@@ -24,6 +24,8 @@ extraResources:
     filter:
       - "**/*"
 
+# TODO Phase 3: Code signing — macOS Gatekeeper WILL block unsigned builds
+# Add: identity, hardenedRuntime, entitlements, notarize (requires Apple Developer $99/yr)
 mac:
   category: public.app-category.utilities
   target:

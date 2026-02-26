@@ -8,6 +8,7 @@
 
 import { ChildProcess, fork } from 'child_process';
 import * as path from 'path';
+import * as fs from 'fs';
 import * as net from 'net';
 import * as os from 'os';
 
@@ -67,6 +68,14 @@ export async function startServer(): Promise<string> {
 
   const serverScript = path.join(standaloneDir, 'server.js');
 
+  // B-2: Copy public/ into standalone dir for dev workflow.
+  // Production builds have public/ via electron-builder extraResources.
+  const publicSrc = path.resolve(standaloneDir, '..', '..', 'public');
+  const publicDst = path.join(standaloneDir, 'public');
+  if (!fs.existsSync(publicDst) && fs.existsSync(publicSrc)) {
+    fs.cpSync(publicSrc, publicDst, { recursive: true });
+  }
+
   const dataDir = getDataDir();
 
   serverProcess = fork(serverScript, [], {
@@ -75,6 +84,7 @@ export async function startServer(): Promise<string> {
       PORT: String(port),
       HOSTNAME: host,
       NEXT_PUBLIC_DESKTOP_MODE: 'true',
+      DESKTOP_MODE: 'true',
       DESKTOP_DATA_DIR: dataDir,
       NODE_ENV: 'production',
     },

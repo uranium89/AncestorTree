@@ -73,7 +73,7 @@ export async function GET(
   return new NextResponse(buffer, {
     headers: {
       'Content-Type': mimeTypes[ext] || 'application/octet-stream',
-      'Cache-Control': 'public, max-age=31536000, immutable',
+      'Cache-Control': 'no-cache',
     },
   });
 }
