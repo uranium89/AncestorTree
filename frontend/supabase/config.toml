@@ -31,9 +31,9 @@ enable_confirmations = false
 
 [storage]
 enabled = true
-file_size_limit = "5MB"
+file_size_limit = "10MB"
 
 [storage.buckets.media]
 public = true
-file_size_limit = "5MB"
-allowed_mime_types = ["image/jpeg", "image/png", "image/webp", "image/gif"]
+file_size_limit = "10MB"
+allowed_mime_types = ["image/jpeg", "image/png", "image/webp", "image/gif", "application/pdf", "application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "video/mp4", "video/webm"]
