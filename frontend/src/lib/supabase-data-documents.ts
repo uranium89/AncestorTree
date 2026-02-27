@@ -120,8 +120,23 @@ export async function deleteDocumentFile(fileUrl: string): Promise<void> {
     return;
   }
 
-  const path = fileUrl.split('/media/').pop();
-  if (path) {
-    await supabase.storage.from('media').remove([path]);
+  // SEC-WARN-02: Use indexOf to handle URLs that contain multiple '/media/' segments.
+  // e.g. https://x.co/storage/v1/object/public/media/documents/media/file.pdf
+  // → correct path: 'documents/media/file.pdf' (not 'file.pdf')
+  const markerIdx = fileUrl.indexOf('/storage/v1/object/public/media/');
+  if (markerIdx !== -1) {
+    const storagePath = fileUrl.slice(markerIdx + '/storage/v1/object/public/media/'.length);
+    if (storagePath) {
+      await supabase.storage.from('media').remove([storagePath]);
+    }
+    return;
+  }
+  // Fallback: try splitting on last '/media/' occurrence
+  const lastMediaIdx = fileUrl.lastIndexOf('/media/');
+  if (lastMediaIdx !== -1) {
+    const storagePath = fileUrl.slice(lastMediaIdx + '/media/'.length);
+    if (storagePath) {
+      await supabase.storage.from('media').remove([storagePath]);
+    }
   }
 }

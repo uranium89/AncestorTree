@@ -4,14 +4,33 @@
  * @description Local media file server for desktop mode.
  *              Serves files from ~/AncestorTree/media/ and handles upload/delete.
  *              MUST return 404 in web mode to prevent unintended file serving.
- * @version 1.0.0
- * @updated 2026-02-26
+ * @version 1.1.0
+ * @updated 2026-02-27
+ * @security SEC-CRIT-01: file size limit enforced (50MB max)
+ * @security SEC-CRIT-02: MIME type allowlist enforced on upload
  */
 
 import { NextRequest, NextResponse } from 'next/server';
 import path from 'path';
 import os from 'os';
 import fs from 'fs';
+
+/** SEC-CRIT-01: Maximum upload file size (50 MB) */
+const MAX_FILE_SIZE = 50 * 1024 * 1024;
+
+/** SEC-CRIT-02: Allowlist of permitted MIME types for upload */
+const ALLOWED_MIME_TYPES = new Set([
+  'image/jpeg',
+  'image/png',
+  'image/gif',
+  'image/webp',
+  'image/svg+xml',
+  'application/pdf',
+  'video/mp4',
+  'video/webm',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+]);
 
 const MEDIA_ROOT = path.join(os.homedir(), 'AncestorTree', 'media');
 
@@ -101,6 +120,22 @@ export async function POST(
   const file = formData.get('file') as File | null;
   if (!file) {
     return NextResponse.json({ error: 'No file provided' }, { status: 400 });
+  }
+
+  // SEC-CRIT-01: Enforce file size limit
+  if (file.size > MAX_FILE_SIZE) {
+    return NextResponse.json(
+      { error: `File too large. Maximum size is ${MAX_FILE_SIZE / 1024 / 1024}MB` },
+      { status: 413 }
+    );
+  }
+
+  // SEC-CRIT-02: Enforce MIME type allowlist
+  if (!ALLOWED_MIME_TYPES.has(file.type)) {
+    return NextResponse.json(
+      { error: `File type '${file.type}' is not allowed` },
+      { status: 415 }
+    );
   }
 
   const arrayBuffer = await file.arrayBuffer();

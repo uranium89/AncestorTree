@@ -349,3 +349,44 @@ chore/upgrade-deps
 - Desktop DB at `~/AncestorTree/data/ancestortree.db`, media at `~/AncestorTree/media/`
 - Boolean columns: SQLite uses 0/1, API route converts ↔ true/false
 - JSONB columns: stored as TEXT in SQLite, `JSON.stringify()`/`JSON.parse()` in API route
+
+## Secure Coding Standards (Updated 2026-02-27)
+
+> Full review: `docs/backend/SECURE-CODING-REVIEW.md`
+> API reference: `docs/backend/API-ENDPOINTS.md`
+
+### Mandatory Controls
+
+**File Upload (OWASP A05):**
+- ALWAYS validate `file.size` before processing — max 50MB for media, 500MB for ZIP import
+- ALWAYS validate MIME type via allowlist (not just file extension)
+- Use `resolveSafePath()` pattern for all local file operations (prevents path traversal)
+
+**SQL / Query Safety (OWASP A03):**
+- ALWAYS use parameterized queries (`?` placeholders) — never string-concatenate user input into SQL
+- Whitelist column names before including in dynamic SQL (query-builder pattern)
+- Escape LIKE special chars: `query.replace(/[%_\\]/g, '\\$&')` before `.ilike()`
+
+**Mass Assignment (OWASP A04):**
+- ALWAYS use allowlist pattern (`allowedFields`) when applying user-provided changes to DB records
+- Never spread untrusted objects directly into Supabase `.update()` or `.insert()`
+
+**Import / Data Integrity (OWASP A08):**
+- Validate ZIP manifest schema before INSERT — check column names against per-table whitelist
+- Use `INSERT OR IGNORE` not `INSERT OR REPLACE` to prevent silent overwrites
+
+**Access Control (OWASP A01):**
+- All desktop API routes MUST call `guardDesktopOnly()` at the top
+- Admin pages require `role === 'admin' || role === 'editor'` check in middleware
+- Contact fields (phone/email/zalo/facebook/address) are PII — never return to unauthenticated users
+
+**Authentication:**
+- Supabase JWT stored in HttpOnly cookies (via `@supabase/ssr`) — never localStorage
+- Desktop mode bypasses auth only when `NEXT_PUBLIC_DESKTOP_MODE === 'true'`
+- Always `try/catch` auth calls with timeout (5s in middleware) to avoid cold-start hangs
+
+### Known Issues (Backlog)
+- `SEC-CRIT-01` P0: No file size limit on `/api/media` upload → add `MAX_FILE_SIZE` check
+- `SEC-CRIT-02` P0: No MIME type validation on upload → validate `file.type` allowlist
+- `SEC-CRIT-03` P1: Import manifest column names not whitelisted → SQL injection via column names
+- `SEC-WARN-02` P2: `deleteDocumentFile` path extraction fragile (multiple `/media/` segments)
