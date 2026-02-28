@@ -46,3 +46,4 @@ docs/data/
 
 # Claude Code local settings (may contain secrets)
 .claude/
+Prompt.md

@@ -2,13 +2,13 @@
 project: AncestorTree
 path: docs/backend/API-ENDPOINTS.md
 type: api-reference
-version: 1.0.0
-updated: 2026-02-27
+version: 1.1.0
+updated: 2026-02-28
 owner: team
 status: approved
 ---
 
-# API Endpoints — AncestorTree v2.2.0
+# API Endpoints — AncestorTree v2.2.1
 
 > **Kiến trúc:** Next.js App Router + Supabase PostgREST
 > **Auth:** Supabase JWT (cookie-based via `@supabase/ssr`)
@@ -18,8 +18,8 @@ status: approved
 
 ## 1. Next.js Internal API Routes
 
-> Tất cả route nội bộ — chỉ hoạt động ở **Desktop Mode** (`NEXT_PUBLIC_DESKTOP_MODE=true`).
-> Web mode → 404.
+> Route nội bộ. Phần lớn chỉ ở **Desktop Mode** (`NEXT_PUBLIC_DESKTOP_MODE=true`).
+> `/api/backup` và `/api/backup/restore` hoạt động **cả Web và Desktop**.
 
 ### 1.1 Desktop DB (SQLite Gateway)
 
@@ -200,6 +200,75 @@ Form fields:
 ```
 
 **⚠️ CẢNH BÁO:** Import xóa toàn bộ dữ liệu hiện tại trước khi restore.
+
+---
+
+### 1.5 Backup (Unified — Web + Desktop)
+
+> **Hoạt động ở cả hai chế độ.** Desktop: query SQLite trực tiếp. Web: dùng Supabase service-role.
+
+| Method | Path | Mô tả |
+|--------|------|--------|
+| POST | `/api/backup` | Xuất toàn bộ 13 bảng ra file ZIP |
+| POST | `/api/backup/restore` | Khôi phục từ file ZIP (xóa dữ liệu cũ trước) |
+
+**POST `/api/backup`**
+```
+Content-Type: application/json
+
+{ "include_media": "skip | reference | inline" }
+```
+
+| Tùy chọn | Hỗ trợ | Mô tả |
+|-----------|---------|--------|
+| `skip` | Desktop + Web | Chỉ dữ liệu, không có ảnh |
+| `reference` | Desktop + Web | Lưu URL tham chiếu (mặc định) |
+| `inline` | Desktop only | Nhúng toàn bộ file media vào ZIP |
+
+**Response:** `application/zip` binary — `giapha-YYYY-MM-DD.zip`
+
+**manifest.json schema (v1.0):**
+```json
+{
+  "version": "1.0",
+  "app_version": "2.2.1",
+  "exported_at": "2026-02-28T10:00:00.000Z",
+  "mode": "web | desktop",
+  "include_media": "reference",
+  "row_counts": { "people": 18, "clan_documents": 5 },
+  "tables": {
+    "people": [...], "families": [...], "children": [...],
+    "contributions": [...], "events": [...], "media": [...],
+    "achievements": [...], "fund_transactions": [...], "scholarships": [...],
+    "clan_articles": [...], "cau_duong_pools": [...],
+    "cau_duong_assignments": [...], "clan_documents": [...]
+  }
+}
+```
+
+**POST `/api/backup/restore`**
+```
+Content-Type: multipart/form-data
+Form fields: file: <ZIP binary>
+```
+
+**Response:**
+```json
+{
+  "ok": true,
+  "mode": "web | desktop",
+  "tables": { "people": 18, "clan_documents": 5 },
+  "total_inserted": 145,
+  "media_restored": 0,
+  "errors": ["optional error list"]
+}
+```
+
+**Giới hạn bảo mật:**
+- Max file size: 500 MB (SEC-WARN-04)
+- Column allowlist per table (SEC-CRIT-03)
+- Web mode: yêu cầu `SUPABASE_SERVICE_ROLE_KEY` server-side
+- Upsert theo batch 500 rows để tránh quá tải payload
 
 ---
 

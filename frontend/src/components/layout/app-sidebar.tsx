@@ -2,8 +2,8 @@
  * @project AncestorTree
  * @file src/components/layout/app-sidebar.tsx
  * @description Main navigation sidebar component
- * @version 2.0.0
- * @updated 2026-02-25
+ * @version 2.1.0
+ * @updated 2026-02-28
  */
 
 'use client';
@@ -47,7 +47,7 @@ import {
   BookOpen,
   ScrollText,
   RotateCcw,
-  FileArchive,
+  DatabaseBackup,
   HelpCircle,
 } from 'lucide-react';
 import { useAuth } from '@/components/auth/auth-provider';
@@ -78,9 +78,7 @@ const adminNavItems = [
   { title: 'QL Cầu đương', url: '/admin/cau-duong', icon: RotateCcw },
   { title: 'QL Tài liệu', url: '/admin/documents', icon: FileText },
   { title: 'Cài đặt', url: '/admin/settings', icon: Settings },
-  ...(process.env.NEXT_PUBLIC_DESKTOP_MODE === 'true'
-    ? [{ title: 'Xuất / Nhập dữ liệu', url: '/admin/import-export', icon: FileArchive }]
-    : []),
+  { title: 'Sao lưu dữ liệu', url: '/admin/backup', icon: DatabaseBackup },
 ];
 
 export function AppSidebar() {
