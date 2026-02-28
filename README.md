@@ -254,6 +254,10 @@ Total setup time: ~30 minutes. Total cost: $0/month.
 
 This project was built using [TinySDLC](https://github.com/Minh-Tam-Solution/tinysdlc) agent orchestrator following [MTS-SDLC-Lite](https://github.com/Minh-Tam-Solution/MTS-SDLC-Lite) methodology.
 
+## Contributors
+
+- [@h4niz](https://github.com/H4niz) — Security review & hardening (OWASP Top 10, API docs, secure coding standards)
+
 ## Contributing
 
 1. Fork the repository
