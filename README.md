@@ -69,6 +69,14 @@ Phần mềm quản lý gia phả điện tử giúp gìn giữ và truyền th�
 - **Hướng dẫn sử dụng** - Trang `/help` trong app: 5 phần (điều hướng, workflow, phân quyền, mẹo, FAQ)
 - **Desktop conditional** - Bản Desktop hiển thị thêm hướng dẫn sao lưu + bảng so sánh Desktop vs Web
 
+### Security & Settings (v2.2.1)
+
+- **Security hardening** - File size limit, MIME type validation, column whitelisting trên import ([@h4niz](https://github.com/H4niz))
+- **Tùy chỉnh tên dòng họ** - Cấu hình qua env vars `NEXT_PUBLIC_CLAN_NAME` / `NEXT_PUBLIC_CLAN_FULL_NAME`
+- **Trang Cài đặt** - `/admin/settings` hiển thị thông tin dòng họ, hệ thống, hướng dẫn thay đổi
+- **API docs** - Tài liệu API endpoints đầy đủ cho 14 bảng + Auth + Storage
+- **Secure coding review** - OWASP Top 10 + ASVS Level 1 audit
+
 ## Tech Stack
 
 | Layer | Technology |
