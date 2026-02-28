@@ -144,7 +144,7 @@ export default function WelcomePage() {
             <Button variant="link" className="text-emerald-200 hover:text-white" asChild>
               <Link href="/login">
                 <LogIn className="mr-2 h-4 w-4" />
-                Con cháu họ Đặng làng Kỷ Các — Đăng nhập
+                Con cháu họ Phạm làng Phù Lưu Hạ — Đăng nhập
               </Link>
             </Button>
           </div>
